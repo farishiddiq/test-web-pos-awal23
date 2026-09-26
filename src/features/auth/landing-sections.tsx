@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   Bank,
   CashRegister,
@@ -69,11 +69,12 @@ export function Showcase() {
           src="/screens/dashboard-desktop.webp"
           alt="Dashboard Possir: penjualan hari ini, grafik 7 hari, laba kotor, uang masuk, pengeluaran, dan arus kas"
           eager
+          className="parallax-far"
         />
         <PhoneShot
           src="/screens/dashboard-mobile.webp"
           alt="Dashboard Possir di HP"
-          className="mx-auto w-[220px] max-md:hidden lg:w-[250px] md:-mb-10"
+          className="parallax-near mx-auto w-[220px] max-md:hidden lg:w-[250px] md:-mb-10"
         />
       </div>
     </section>
@@ -122,8 +123,36 @@ const TABS: Array<{
 /** Fitur utama: pilih di kiri, screenshot asli di kanan */
 export function FeatureTour() {
   const [active, setActive] = useState<TabKey>('kasir');
+  // Berputar sendiri sampai pengguna memilih tab. Tertahan saat disentuh kursor, difokus,
+  // atau di luar layar. Tidak berputar untuk pengguna "kurangi gerak".
+  const [auto, setAuto] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [hold, setHold] = useState(false);
+  const [inView, setInView] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || !auto) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.35 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [auto]);
+
+  const next = () => {
+    const i = TABS.findIndex((t) => t.key === active);
+    setActive(TABS[(i + 1) % TABS.length].key);
+  };
+
   return (
-    <section id="fitur" className="mx-auto max-w-[1200px] scroll-mt-24 px-5 pt-24 md:px-8 md:pt-32">
+    <section
+      ref={sectionRef}
+      id="fitur"
+      className="mx-auto max-w-[1200px] scroll-mt-24 px-5 pt-24 md:px-8 md:pt-32"
+      onPointerEnter={(e) => e.pointerType === 'mouse' && setHold(true)}
+      onPointerLeave={() => setHold(false)}
+      onFocus={() => setHold(true)}
+      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && setHold(false)}
+    >
       <h2 className="max-w-[18ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">
         Semua yang dicatat usaha kecil, di satu HP.
       </h2>
@@ -139,9 +168,12 @@ export function FeatureTour() {
                 id={`tab-${t.key}`}
                 aria-selected={on}
                 aria-controls={`panel-${t.key}`}
-                onClick={() => setActive(t.key)}
+                onClick={() => {
+                  setAuto(false);
+                  setActive(t.key);
+                }}
                 className={cn(
-                  'pressable grid grid-cols-[40px_minmax(0,1fr)] gap-x-3.5 rounded-[22px] p-4 text-left transition-colors duration-200',
+                  'pressable relative grid grid-cols-[40px_minmax(0,1fr)] gap-x-3.5 rounded-[22px] p-4 text-left transition-colors duration-200',
                   on ? 'bg-surface shadow-[var(--shadow-card)]' : 'hover:bg-surface/60',
                 )}
               >
@@ -152,6 +184,16 @@ export function FeatureTour() {
                   <span className="block text-[16px] font-bold text-ink">{t.title}</span>
                   <span className={cn('mt-1 block text-[14px] leading-relaxed text-ink-2', !on && 'max-lg:hidden')}>{t.body}</span>
                 </span>
+                {auto && on && (
+                  <span aria-hidden className="absolute inset-x-5 bottom-2 h-[3px] overflow-hidden rounded-full bg-surface-3">
+                    <span
+                      key={active}
+                      className="tour-progress block h-full rounded-full bg-brand"
+                      data-paused={hold || !inView}
+                      onAnimationEnd={next}
+                    />
+                  </span>
+                )}
               </button>
             );
           })}
@@ -247,7 +289,7 @@ export function Testimonials() {
     <section id="testimoni" className="mx-auto max-w-[1200px] scroll-mt-24 px-5 pt-24 md:px-8 md:pt-32">
       <h2 className="max-w-[20ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">Kata mereka yang sudah pakai.</h2>
       <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-        <figure className="flex flex-col justify-between rounded-[var(--radius-card)] bg-brand p-7 text-on-brand md:p-9">
+        <figure className="reveal flex flex-col justify-between rounded-[var(--radius-card)] bg-brand p-7 text-on-brand md:p-9">
           <Quotes size={36} weight="fill" aria-hidden className="opacity-60" />
           <blockquote className="mt-6 text-[22px] font-semibold leading-snug tracking-[-0.015em] md:text-[26px]">
             {'“'}
@@ -258,7 +300,7 @@ export function Testimonials() {
         </figure>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {rest.map((t, i) => (
-            <figure key={t.name} className={cn('card flex flex-col justify-between p-6', i === rest.length - 1 && rest.length % 2 === 1 && 'sm:col-span-2')}>
+            <figure key={t.name} style={{ '--i': i + 1 } as CSSProperties} className={cn('reveal card flex flex-col justify-between p-6', i === rest.length - 1 && rest.length % 2 === 1 && 'sm:col-span-2')}>
               <blockquote className="text-[15.5px] leading-relaxed text-ink">
                 {'“'}
                 {t.quote}
@@ -348,15 +390,15 @@ const FACTS = [
 export function FactsBand() {
   return (
     <section className="px-2.5 pt-24 md:px-4 md:pt-32">
-      <div className="relative isolate overflow-hidden rounded-[32px] bg-[var(--deep)] px-5 py-14 text-[var(--on-deep)] md:rounded-[40px] md:px-8 md:py-20">
+      <div className="relative isolate overflow-clip rounded-[32px] bg-[var(--deep)] px-5 py-14 text-[var(--on-deep)] md:rounded-[40px] md:px-8 md:py-20">
         <span aria-hidden className="brand-rings -bottom-56 -right-32 -z-10 size-[480px] border-[72px]" />
         <div className="mx-auto max-w-[1200px]">
           <h2 className="max-w-[22ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">
             Dibuat untuk cara jualan <span className="text-lime">Masisir</span>.
           </h2>
           <dl className="mt-12 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-            {FACTS.map(([big, text]) => (
-              <div key={big} className="border-t border-white/15 pt-5">
+            {FACTS.map(([big, text], i) => (
+              <div key={big} style={{ '--i': i } as CSSProperties} className="reveal border-t border-white/15 pt-5">
                 <dt className="text-[44px] font-bold leading-none tracking-[-0.04em] text-lime md:text-[52px]">{big}</dt>
                 <dd className="mt-3 max-w-[26ch] text-[15px] leading-relaxed text-[var(--on-deep-2)]">{text}</dd>
               </div>

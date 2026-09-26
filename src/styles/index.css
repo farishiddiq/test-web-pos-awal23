@@ -330,3 +330,99 @@
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------------
+   Landing motion. Hanya transform + opacity. Scroll-driven (tanpa JS per scroll);
+   browser tanpa dukungan dan pengguna "kurangi gerak" melihat posisi akhir.
+   --------------------------------------------------------------------- */
+
+/* 3. Pembuka masuk bertahap, sekali. Kotak masuk/daftar sengaja tidak ikut. */
+.hero-in {
+  transition:
+    opacity 500ms var(--ease-out) calc(var(--i, 0) * 60ms),
+    transform 500ms var(--ease-out) calc(var(--i, 0) * 60ms);
+  @starting-style {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-in {
+    transition: opacity 200ms ease;
+    @starting-style {
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* 1. Paralaks: HP menyusul lebih cepat dari laptop, jadi terasa lebih dekat */
+    .parallax-far {
+      animation: parallax-far linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 55%;
+    }
+    .parallax-near {
+      animation: parallax-near linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 55%;
+    }
+    @media (min-width: 768px) {
+      .parallax-rings {
+        animation: parallax-rings linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 900px;
+      }
+    }
+
+    /* 4. Muncul saat masuk layar, digeser per indeks supaya berurutan */
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry calc(10% + var(--i, 0) * 6%) entry calc(60% + var(--i, 0) * 6%);
+    }
+  }
+}
+@keyframes parallax-far {
+  from { transform: translateY(48px); }
+  to { transform: none; }
+}
+@keyframes parallax-near {
+  from { transform: translateY(120px); }
+  to { transform: none; }
+}
+@keyframes parallax-rings {
+  to { transform: translateY(-18%); }
+}
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 2. Garis progres tab tur fitur yang berputar sendiri */
+.tour-progress {
+  transform-origin: left;
+  animation: tour-progress var(--tour-ms, 6000ms) linear forwards;
+}
+.tour-progress[data-paused='true'] {
+  animation-play-state: paused;
+}
+@keyframes tour-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.tour-panel {
+  transform: none;
+  transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+  @starting-style {
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-panel {
+    @starting-style {
+      transform: none;
+    }
+  }
+}
