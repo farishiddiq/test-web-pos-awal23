@@ -421,6 +421,15 @@ export interface Report {
   by_hour: Array<{ hour: number; revenue: number; transactions: number }>;
 }
 
+export interface CashFlow {
+  from: string;
+  to: string;
+  in: { sales: number; debt_collected: number; total: number };
+  out: { expenses: number; purchases: number; supplier_payments: number; total: number };
+  net: number;
+  by_method: Array<{ code: string; name: string; in: number; out: number; net: number }>;
+}
+
 export interface Member {
   user_id: string;
   display_name: string | null;

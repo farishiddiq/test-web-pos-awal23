@@ -89,6 +89,16 @@ export function useReport(from: string, to: string) {
   });
 }
 
+export function useCashFlow(from: string, to: string) {
+  const { businessId, isOwner } = useBusiness();
+  return useQuery({
+    queryKey: ['biz', businessId, 'cashflow', from, to],
+    queryFn: () => api.cashFlow(businessId, from, to),
+    enabled: isOwner,
+    placeholderData: keepPreviousData,
+  });
+}
+
 export function useSuppliers() {
   const { businessId, isOwner } = useBusiness();
   return useQuery({

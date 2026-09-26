@@ -17,6 +17,7 @@ import { Page } from '@/components/layout/app-shell';
 import { ButtonLink } from '@/components/ui/button';
 import { Avatar, Badge, Delta, EmptyState, ErrorState, Money, PageHeader, SectionCard, Skeleton, StatTile } from '@/components/ui/display';
 import { ColumnChart, InlineBar } from '@/components/charts/column-chart';
+import { CashFlowCard } from '@/components/cashflow/cash-flow-card';
 import { SaleRow, SaleRowSkeleton, paymentIcon } from '@/components/sale/sale-bits';
 import { SaleDetailSheet } from '@/features/transaksi/sale-detail-sheet';
 import { useBusiness } from '@/data/business';
@@ -109,6 +110,8 @@ function DashboardBody({ data, onOpenSale }: { data: Dashboard; onOpenSale: (id:
           </>
         )}
       </div>
+
+      {isOwner && <CashFlowCard from={today} to={today} title="Arus kas hari ini" className="lg:col-span-12" />}
 
       <ReceivablesCard data={data} className="lg:col-span-6" />
       <LowStockCard data={data} className="lg:col-span-6" />

@@ -7,7 +7,7 @@ import { Button, IconButton } from '@/components/ui/button';
 import { Segmented } from '@/components/ui/choice';
 import { EmptyState, ErrorState, Money, PageHeader, Row, SectionCard, Skeleton, StatTile } from '@/components/ui/display';
 import { ColumnChart, InlineBar } from '@/components/charts/column-chart';
-import { paymentIcon } from '@/components/sale/sale-bits';
+import { CashFlowCard } from '@/components/cashflow/cash-flow-card';
 import { expenseIcon } from '@/features/pengeluaran/expense-sheet';
 import { useBusiness } from '@/data/business';
 import { useReport } from '@/data/queries';
@@ -132,8 +132,6 @@ function ReportBody({ report, kind }: { report: Report; kind: Kind }) {
       </div>
     );
   }
-  const methods = report.by_method.filter((m) => m.kind !== 'debt' && m.total > 0);
-  const maxMethod = Math.max(0, ...methods.map((m) => m.total));
   const maxExpense = Math.max(0, ...report.expenses_by_category.map((e) => e.amount));
 
   return (
@@ -143,7 +141,7 @@ function ReportBody({ report, kind }: { report: Report; kind: Kind }) {
           Laba bersih
         </p>
         <Money value={s.net_profit} className={cn('mt-1 block text-[44px] font-bold leading-none tracking-[-0.035em]', s.net_profit < 0 && 'text-danger')} />
-        <p className="mt-2 text-[13px] text-ink-3">Setelah modal barang dan pengeluaran operasional</p>
+        <p className="mt-2 text-[13px] text-ink-3">Setelah modal barang dan pengeluaran operasional. Belanja stok tidak dikurangi dua kali: sudah masuk lewat modal barang saat terjual.</p>
         <div className="mt-6 rounded-[18px] bg-surface-2 px-4 py-2">
           <Row label="Penjualan (omzet)" value={<Money value={s.revenue} />} />
           <Row label="Modal barang (HPP)" value={<Money value={-s.cogs} />} muted />
@@ -168,31 +166,7 @@ function ReportBody({ report, kind }: { report: Report; kind: Kind }) {
         <SalesChartCard report={report} kind={kind} />
       </div>
 
-      <SectionCard title="Uang masuk" className="lg:col-span-6">
-        <Money value={s.cash_in} className="block text-[28px] font-bold tracking-[-0.03em]" />
-        <p className="text-[13px] text-ink-3">Dari penjualan dan pembayaran hutang</p>
-        {methods.length > 0 && (
-          <ul className="mt-4 grid gap-3.5">
-            {methods.map((m) => {
-              const I = paymentIcon(m.code, m.kind);
-              return (
-                <li key={m.code} className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
-                  <span className="grid size-7 place-items-center rounded-full bg-surface-2 text-ink-2">
-                    <I size={15} aria-hidden />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-[14px] font-semibold">{m.name}</span>
-                    {m.debt_payments > 0 && <span className="block text-[12px] text-ink-3">termasuk {formatMoney(m.debt_payments)} bayaran hutang</span>}
-                  </span>
-                  <Money value={m.total} tabular className="text-[14px] font-semibold" />
-                  <span />
-                  <InlineBar value={m.total} max={maxMethod} className="col-span-2" />
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </SectionCard>
+      <CashFlowCard from={report.from} to={report.to} className="lg:col-span-6" />
 
       <SectionCard title="Piutang" className="lg:col-span-6" action={<Link to="/piutang" className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:underline">Kelola <ArrowRight size={14} weight="bold" /></Link>}>
         <div className="grid grid-cols-2 gap-3">

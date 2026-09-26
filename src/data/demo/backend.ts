@@ -1,7 +1,8 @@
 import { PGliteWorker } from '@electric-sql/pglite/worker';
 import shimSql from '../../../supabase/pglite/auth-shim.sql?raw';
 import tablesSql from '../../../supabase/migrations/20260926000100_possir_tables.sql?raw';
-import apiSql from '../../../supabase/migrations/20260926000200_possir_api.sql?raw';
+import apiCoreSql from '../../../supabase/migrations/20260926000200_possir_api.sql?raw';
+import cashFlowSql from '../../../supabase/migrations/20260927000100_possir_cashflow.sql?raw';
 import seedSql from '../../../supabase/pglite/demo-seed.sql?raw';
 import { ApiError, toApiError, type Backend } from '../backend';
 import { DEMO_DB_NAME, DEMO_USER } from './constants';
@@ -44,6 +45,7 @@ function fingerprint(text: string): string {
   }
   return (h >>> 0).toString(16);
 }
+const apiSql = `${apiCoreSql}\n;\n${cashFlowSql}`;
 const SCHEMA_HASH = fingerprint(shimSql + tablesSql + seedSql);
 const API_HASH = fingerprint(apiSql);
 

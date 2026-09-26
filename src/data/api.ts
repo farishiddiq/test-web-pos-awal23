@@ -19,6 +19,7 @@ import type {
   PurchaseInput,
   PurchaseListItem,
   Report,
+  CashFlow,
   Role,
   Sale,
   SaleInput,
@@ -122,6 +123,7 @@ export const api = {
   // laporan
   dashboard: (b: string, date?: string) => rpc<Dashboard>('get_dashboard', { p_business_id: b, p_date: date ?? null }),
   report: (b: string, from: string, to: string) => rpc<Report>('get_report', { p_business_id: b, p_from: from, p_to: to }),
+  cashFlow: (b: string, from: string, to: string) => rpc<CashFlow>('get_cash_flow', { p_business_id: b, p_from: from, p_to: to }),
 
   // anggota
   members: (b: string) => rpc<Members>('list_members', { p_business_id: b }),

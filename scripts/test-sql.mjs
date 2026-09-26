@@ -31,6 +31,7 @@ const t0 = performance.now();
 await db.exec(read('supabase/pglite/auth-shim.sql'));
 await db.exec(read('supabase/migrations/20260926000100_possir_tables.sql'));
 await db.exec(read('supabase/migrations/20260926000200_possir_api.sql'));
+await db.exec(read('supabase/migrations/20260927000100_possir_cashflow.sql'));
 console.log(`Migrasi selesai dalam ${Math.round(performance.now() - t0)} ms`);
 
 // Peta argumen fungsi publik supaya bisa dipanggil dengan parameter bernama
@@ -298,6 +299,30 @@ dash = await rpc('get_dashboard', { p_business_id: B });
 const yesterday = dash.series[5];
 eq(yesterday.sales, 15, 'transaksi 23:30 masuk ke hari kemarin');
 eq(dash.today.transactions, 3, 'hari ini tidak ikut terhitung');
+
+// ---------------------------------------------------------------------
+console.log('Arus kas sinkron dengan laporan');
+await as(OWNER);
+{
+  const from = new Date(Date.parse(today) - 40 * 864e5).toISOString().slice(0, 10);
+  const rep = await rpc('get_report', { p_business_id: B, p_from: from, p_to: today });
+  const cf = await rpc('get_cash_flow', { p_business_id: B, p_from: from, p_to: today });
+  const r2 = (n) => Math.round(Number(n) * 100) / 100;
+  eq(r2(cf.in.total), r2(rep.summary.cash_in), 'uang masuk = laporan');
+  eq(r2(cf.out.expenses), r2(rep.summary.expenses), 'pengeluaran = laporan');
+  eq(r2(cf.net), r2(cf.in.total - cf.out.total), 'saldo = masuk - keluar');
+  const byNet = cf.by_method.reduce((s, m) => s + Number(m.net), 0);
+  eq(r2(byNet), r2(cf.net), 'saldo per metode dijumlah = saldo total');
+  eq(r2(cf.in.total), r2(Number(cf.in.sales) + Number(cf.in.debt_collected)), 'rincian masuk pas');
+  eq(r2(cf.out.total), r2(Number(cf.out.expenses) + Number(cf.out.purchases) + Number(cf.out.supplier_payments)), 'rincian keluar pas');
+  const before = Number(cf.out.total);
+  await rpc('save_expense', { p_business_id: B, p_expense: { category: 'Gas', amount: 37.5, spent_on: today } });
+  const cf2 = await rpc('get_cash_flow', { p_business_id: B, p_from: from, p_to: today });
+  eq(r2(cf2.out.total - before), 37.5, 'pengeluaran baru langsung mengurangi saldo');
+  await as(CASHIER);
+  eq((await rpcError('get_cash_flow', { p_business_id: B, p_from: today, p_to: today }))?.code, 'PT403', 'kasir tidak bisa lihat arus kas');
+  await as(OWNER);
+}
 
 // ---------------------------------------------------------------------
 console.log('Performa (seed demo)');
