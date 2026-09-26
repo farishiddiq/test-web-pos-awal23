@@ -1,0 +1,272 @@
+@import "tailwindcss";
+@import "@fontsource-variable/plus-jakarta-sans";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------------
+   Token warna. Nilai kontras sudah dihitung (WCAG AA): teks >= 4.5:1,
+   batas input >= 3:1. Lihat DESIGN.md untuk peran setiap token.
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+  --canvas: #eef1ec;
+  --surface: #fbfcfa;
+  --surface-2: #f3f5f1;
+  --surface-3: #e7ebe6;
+  --line: #e1e6e0;
+  --field: #86928b;
+  --ink: #15201b;
+  --ink-2: #4b5852;
+  --ink-3: #5e6a64;
+  --brand: #1e6a51;
+  --brand-strong: #16553f;
+  --on-brand: #fbfcfa;
+  --brand-soft: #dceee5;
+  --brand-ink: #104a38;
+  --lime: #d4f26b;
+  --on-lime: #15201b;
+  --danger: #b3392c;
+  --danger-soft: #fbe3df;
+  --danger-ink: #8e2a1f;
+  --warn-soft: #fcefd3;
+  --warn-ink: #8a5600;
+  --chart-muted: #a3afa8;
+  --scrim: rgb(13 20 16 / 0.42);
+
+  --tint-lime-bg: #eef7cf;  --tint-lime-fg: #3e5a00;
+  --tint-mint-bg: #dcefe5;  --tint-mint-fg: #145a43;
+  --tint-sky-bg: #ddebf3;   --tint-sky-fg: #1d5673;
+  --tint-sand-bg: #f3ead7;  --tint-sand-fg: #6a4c10;
+  --tint-peach-bg: #f9e3d3; --tint-peach-fg: #8a3e10;
+  --tint-rose-bg: #f8dfdd;  --tint-rose-fg: #8c2b2a;
+  --tint-stone-bg: #e8e9e4; --tint-stone-fg: #454a44;
+
+  --shadow-card: 0 1px 2px rgb(21 32 27 / 0.04), 0 12px 32px -20px rgb(21 32 27 / 0.2);
+  --shadow-float: 0 2px 6px rgb(21 32 27 / 0.06), 0 24px 48px -24px rgb(21 32 27 / 0.32);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0d1310;
+  --surface: #141c18;
+  --surface-2: #1a241f;
+  --surface-3: #22302a;
+  --line: #25312b;
+  --field: #65746c;
+  --ink: #e8efea;
+  --ink-2: #a8b6ae;
+  --ink-3: #8b9991;
+  --brand: #58c29a;
+  --brand-strong: #6fd0aa;
+  --on-brand: #06140e;
+  --brand-soft: #173a2e;
+  --brand-ink: #9ee3c6;
+  --lime: #cbea5e;
+  --on-lime: #10170c;
+  --danger: #f08a7e;
+  --danger-soft: #3a1c19;
+  --danger-ink: #f5b0a7;
+  --warn-soft: #33270f;
+  --warn-ink: #f0c46a;
+  --chart-muted: #4c5a53;
+  --scrim: rgb(0 0 0 / 0.6);
+
+  --tint-lime-bg: #26301a;  --tint-lime-fg: #cde98c;
+  --tint-mint-bg: #17332a;  --tint-mint-fg: #93d8b9;
+  --tint-sky-bg: #172b38;   --tint-sky-fg: #a0cbe6;
+  --tint-sand-bg: #2e2719;  --tint-sand-fg: #e4c68c;
+  --tint-peach-bg: #3a2519; --tint-peach-fg: #f2b38d;
+  --tint-rose-bg: #3a1f1f;  --tint-rose-fg: #f1a7a1;
+  --tint-stone-bg: #262a26; --tint-stone-fg: #c6ccc4;
+
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 12px 32px -20px rgb(0 0 0 / 0.7);
+  --shadow-float: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 24px 48px -24px rgb(0 0 0 / 0.85);
+}
+
+@theme inline {
+  --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-on-brand: var(--on-brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-lime: var(--lime);
+  --color-on-lime: var(--on-lime);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-ink: var(--danger-ink);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-ink: var(--warn-ink);
+
+  --radius-card: 24px;
+  --radius-tile: 16px;
+  --radius-field: 14px;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-float: var(--shadow-float);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ---------------------------------------------------------------------
+   Dasar
+   --------------------------------------------------------------------- */
+@layer base {
+  html {
+    background: var(--canvas);
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  body {
+    min-height: 100dvh;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    font-feature-settings: "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  input, textarea, select, button {
+    font: inherit;
+    color: inherit;
+  }
+  /* 16px mencegah Safari iOS zoom otomatis saat fokus */
+  input, textarea, select {
+    font-size: 16px;
+  }
+  ::selection {
+    background: var(--lime);
+    color: var(--on-lime);
+  }
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  [data-theme="dark"] :focus-visible {
+    outline-color: var(--lime);
+  }
+}
+
+@layer components {
+  /* Umpan balik tekan: halus, cepat, dan hanya saat gerak diizinkan */
+  .pressable {
+    transition: transform 160ms var(--ease-out), background-color 160ms ease, color 160ms ease,
+      box-shadow 160ms ease, opacity 160ms ease;
+    touch-action: manipulation;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pressable:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Skeleton: kilau pelan, berhenti saat reduced motion */
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
+    background-size: 200% 100%;
+    border-radius: 10px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .skeleton {
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+  }
+  @keyframes shimmer {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+  }
+
+  /* Material translusen untuk navigasi bawah dan bar keranjang */
+  .material {
+    background: color-mix(in oklab, var(--surface) 82%, transparent);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .material {
+      background: var(--surface);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Tanda sukses: masuk halus dari 0.9 (bukan 0), hanya sekali per transaksi */
+  .success-pop {
+    transition: transform 240ms var(--ease-out), opacity 240ms var(--ease-out);
+    @starting-style {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .success-pop {
+      transition: opacity 200ms ease;
+      @starting-style {
+        transform: none;
+      }
+    }
+  }
+}
+
+/* Sonner: ikut token Possir */
+[data-sonner-toaster] {
+  --normal-bg: var(--surface);
+  --normal-text: var(--ink);
+  --normal-border: var(--line);
+  --border-radius: 16px;
+  font-family: var(--font-sans);
+}
+
+/* Vaul: permukaan sheet */
+[data-vaul-drawer] {
+  outline: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
