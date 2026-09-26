@@ -6,9 +6,9 @@ const KEY = 'possir.theme';
 function readPref(): ThemePref {
   try {
     const v = localStorage.getItem(KEY);
-    return v === 'light' || v === 'dark' ? v : 'system';
+    return v === 'system' || v === 'dark' ? v : 'light';
   } catch {
-    return 'system';
+    return 'light';
   }
 }
 
@@ -33,8 +33,7 @@ export function useTheme(): [ThemePref, (pref: ThemePref) => void] {
 
   const update = useCallback((next: ThemePref) => {
     try {
-      if (next === 'system') localStorage.removeItem(KEY);
-      else localStorage.setItem(KEY, next);
+      localStorage.setItem(KEY, next);
     } catch {
       // abaikan
     }
