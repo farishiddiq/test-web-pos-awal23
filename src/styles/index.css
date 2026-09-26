@@ -241,6 +241,14 @@
       opacity: 0;
     }
   }
+  /* Landing: screenshot fitur berganti dengan crossfade singkat saat tab dipilih */
+  .tour-panel {
+    transition: opacity 220ms var(--ease-out);
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .success-pop {
       transition: opacity 200ms ease;

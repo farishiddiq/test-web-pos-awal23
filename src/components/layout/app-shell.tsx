@@ -37,7 +37,7 @@ function DemoBanner() {
   const { signOut } = useSession();
   const navigate = useNavigate();
   return (
-    <div className="no-print border-b border-line bg-[color-mix(in_oklab,var(--lime)_32%,var(--canvas))] px-4 py-2 text-[13px] text-ink md:hidden">
+    <div data-demo-ui className="no-print border-b border-line bg-[color-mix(in_oklab,var(--lime)_32%,var(--canvas))] px-4 py-2 text-[13px] text-ink md:hidden">
       <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-3">
         <p className="min-w-0">
           <span className="font-bold">Mode demo.</span>{' '}
@@ -110,7 +110,7 @@ function Sidebar() {
         ))}
       </nav>
       {mode === 'demo' && (
-        <div className="mx-3 mb-3 rounded-[18px] bg-[color-mix(in_oklab,var(--lime)_38%,var(--surface))] p-3 text-center xl:text-left">
+        <div data-demo-ui className="mx-3 mb-3 rounded-[18px] bg-[color-mix(in_oklab,var(--lime)_38%,var(--surface))] p-3 text-center xl:text-left">
           <p className="text-[12px] font-bold uppercase tracking-[0.06em] text-on-lime xl:text-[13px] xl:normal-case xl:tracking-normal">
             Demo
             <span className="hidden font-semibold xl:inline"> · data di browser ini</span>
