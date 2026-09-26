@@ -1,13 +1,13 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowRight, EnvelopeSimple } from '@phosphor-icons/react';
+import { ArrowRight, EnvelopeSimple, MapPin } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { useSession } from '@/data/session';
 import { Logo } from '@/components/layout/logo';
 import { Button } from '@/components/ui/button';
 import { Field, TextInput } from '@/components/ui/form';
 import { Segmented } from '@/components/ui/choice';
-import { EgyptDetails, FeatureTour, FinalCta, Showcase, Testimonials } from './landing-sections';
+import { BrandFooter, BusinessMarquee, EgyptDetails, FactsBand, FeatureTour, FinalCta, Showcase, Testimonials } from './landing-sections';
 
 type Mode = 'login' | 'register' | 'forgot';
 
@@ -30,7 +30,7 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
   return (
     <div className="min-h-dvh overflow-x-clip">
       <header className="material sticky top-0 z-40 border-b border-line/70">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-5 md:h-[72px] md:px-8">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-3 px-5 md:h-[72px] md:px-8">
           <Logo />
           <nav aria-label="Halaman" className="flex items-center gap-1 md:gap-2">
             <a href="#fitur" className="hidden rounded-full px-3 py-2 text-[14px] font-semibold text-ink-2 hover:text-ink md:inline">Fitur</a>
@@ -41,39 +41,50 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 px-5 pb-14 pt-10 md:px-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center lg:gap-14 lg:pb-20 lg:pt-16">
-        <div className="min-w-0">
-          <h1 className="max-w-[14ch] text-[40px] font-bold leading-[1.04] tracking-[-0.035em] sm:text-[50px] lg:text-[58px]">
-            Kasir untuk usaha Masisir.
-          </h1>
-          <p className="mt-5 max-w-[44ch] text-[16px] leading-relaxed text-ink-2 md:text-[17px]">
-            Catat penjualan, stok, hutang teman, dan untung usaha mahasiswa Indonesia di Mesir dari HP. Semua pakai EGP.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3 max-lg:hidden">
-            <Button size="lg" onClick={() => openAuth('register')} iconRight={<ArrowRight size={18} weight="bold" />}>Daftar gratis</Button>
-            <Button size="lg" variant="secondary" onClick={() => document.getElementById('fitur')?.scrollIntoView({ behavior: 'smooth' })}>Lihat fitur</Button>
+      <section className="px-2.5 pt-2.5 md:px-4 md:pt-4">
+        <div className="relative isolate overflow-hidden rounded-[32px] bg-[var(--deep)] text-[var(--on-deep)] md:rounded-[40px]">
+          <span aria-hidden className="brand-rings -right-40 -top-48 size-[620px] border-[88px] md:-right-24" />
+          <span aria-hidden className="brand-rings -bottom-72 -left-40 size-[520px] border-[72px] max-md:hidden" />
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[var(--deep-2)]" />
+
+          <div className="relative mx-auto grid max-w-[1200px] grid-cols-1 gap-10 px-5 pb-40 pt-12 md:px-8 md:pb-52 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center lg:gap-14 lg:pt-20">
+            <div className="min-w-0">
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-[13px] font-semibold text-[var(--on-deep-2)]">
+                <MapPin size={15} weight="fill" className="text-lime" aria-hidden /> Untuk mahasiswa Indonesia di Mesir
+              </p>
+              <h1 className="mt-5 max-w-[14ch] text-[42px] font-bold leading-[1.03] tracking-[-0.035em] sm:text-[54px] lg:text-[62px]">
+                Kasir untuk usaha <span className="text-lime">Masisir</span>.
+              </h1>
+              <p className="mt-5 max-w-[42ch] text-[16px] leading-relaxed text-[var(--on-deep-2)] md:text-[17.5px]">
+                Catat penjualan, stok, hutang teman, dan untung usahamu dari HP. Semua dalam EGP.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3 max-lg:hidden">
+                <button type="button" onClick={() => openAuth('register')} className="pressable inline-flex h-14 items-center gap-2 rounded-full bg-lime px-7 text-[16px] font-bold text-on-lime hover:brightness-105">
+                  Daftar gratis <ArrowRight size={18} weight="bold" aria-hidden />
+                </button>
+                <a href="#fitur" className="pressable inline-flex h-14 items-center rounded-full border border-white/25 px-7 text-[16px] font-bold hover:bg-white/10">
+                  Lihat fitur
+                </a>
+              </div>
+            </div>
+            <div ref={cardRef} className="text-ink">
+              <AuthCard mode={mode} onModeChange={setMode} />
+            </div>
           </div>
-        </div>
-        <div ref={cardRef}>
-          <AuthCard mode={mode} onModeChange={setMode} />
         </div>
       </section>
 
       <Showcase />
+      <BusinessMarquee />
       <FeatureTour />
+      <FactsBand />
       <EgyptDetails />
       <Testimonials />
       <FinalCta>
         <Button size="lg" onClick={() => openAuth('register')} iconRight={<ArrowRight size={18} weight="bold" />}>Daftar gratis</Button>
         <Button size="lg" variant="secondary" onClick={() => openAuth('login')}>Masuk</Button>
       </FinalCta>
-
-      <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-5 py-8 text-[13px] text-ink-3 md:px-8">
-          <Logo size={24} />
-          <p>Untuk warung rumahan, katering, frozen food, jastip, dan usaha Masisir lainnya.</p>
-        </div>
-      </footer>
+      <BrandFooter onAuth={openAuth} />
     </div>
   );
 }

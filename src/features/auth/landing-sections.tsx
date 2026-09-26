@@ -9,8 +9,17 @@ import {
   Money as MoneyIcon,
   Package,
   Quotes,
+  Cookie,
+  CookingPot,
+  Coffee,
+  Snowflake,
+  ShoppingBag,
+  BowlFood,
+  Cake,
+  Storefront,
 } from '@phosphor-icons/react';
 import { Avatar } from '@/components/ui/display';
+import { Logo } from '@/components/layout/logo';
 import { cn } from '@/lib/util';
 import { TESTIMONIALS } from './testimonials';
 
@@ -54,7 +63,7 @@ export function PhoneShot({ src, alt, eager, className }: { src: string; alt: st
 /** Tepat di bawah hero: dashboard asli di laptop dan HP */
 export function Showcase() {
   return (
-    <section aria-label="Tampilan Possir" className="mx-auto max-w-[1200px] px-5 md:px-8">
+    <section aria-label="Tampilan Possir" className="relative z-10 mx-auto -mt-32 max-w-[1200px] px-5 md:-mt-44 md:px-8">
       <div className="grid grid-cols-1 items-end gap-6 md:grid-cols-[minmax(0,1fr)_220px] lg:grid-cols-[minmax(0,1fr)_250px] lg:gap-8">
         <DesktopShot
           src="/screens/dashboard-desktop.webp"
@@ -176,7 +185,7 @@ export function FeatureTour() {
 export function EgyptDetails() {
   return (
     <section className="mx-auto max-w-[1200px] px-5 pt-24 md:px-8 md:pt-32">
-      <h2 className="max-w-[20ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">Dibuat untuk cara jualan Masisir.</h2>
+      <h2 className="max-w-[20ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">Hal kecil yang sering bikin rugi, sudah diurus.</h2>
       <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-6 md:grid-rows-[auto_auto]">
         <article className="rounded-[var(--radius-card)] p-6 md:col-span-4" style={{ background: 'var(--tint-lime-bg)' }}>
           <h3 className="text-[19px] font-bold">Semua dalam EGP, cara bayar Mesir</h3>
@@ -281,13 +290,115 @@ function Person({ t, className, inverted }: { t: (typeof TESTIMONIALS)[number]; 
 export function FinalCta({ children }: { children: ReactNode }) {
   return (
     <section className="mx-auto max-w-[1200px] px-5 py-24 md:px-8 md:py-32">
-      <div className="grid grid-cols-1 items-center gap-6 rounded-[32px] bg-surface px-6 py-10 shadow-[var(--shadow-card)] md:grid-cols-[minmax(0,1fr)_auto] md:px-12 md:py-14">
+      <div className="relative isolate grid grid-cols-1 items-center gap-6 overflow-hidden rounded-[32px] bg-lime px-6 py-10 text-on-lime md:grid-cols-[minmax(0,1fr)_auto] md:px-12 md:py-14">
+        <span aria-hidden className="brand-rings -right-24 -top-32 -z-10 size-[360px] border-[56px] !border-[color-mix(in_oklab,var(--on-lime)_7%,transparent)]" />
         <div>
           <h2 className="max-w-[22ch] text-[28px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[36px]">Mulai catat jualan hari ini.</h2>
-          <p className="mt-3 max-w-[48ch] text-[15.5px] text-ink-2">Gratis. Cukup email, lalu buat usaha pertamamu dalam dua menit.</p>
+          <p className="mt-3 max-w-[48ch] text-[15.5px] opacity-80">Gratis. Cukup email, lalu buat usaha pertamamu dalam dua menit.</p>
         </div>
         <div className="flex flex-wrap gap-3">{children}</div>
       </div>
     </section>
+  );
+}
+
+const BUSINESS_TYPES = [
+  [CookingPot, 'Katering rumahan'],
+  [Snowflake, 'Frozen food'],
+  [ShoppingBag, 'Jastip'],
+  [BowlFood, 'Warung bakso dan soto'],
+  [Cake, 'Kue dan roti'],
+  [Coffee, 'Minuman dan kopi'],
+  [Cookie, 'Camilan kemasan'],
+  [Storefront, 'Toko kelontong'],
+] as const;
+
+/** Jenis usaha yang cocok. Satu-satunya marquee di halaman. */
+export function BusinessMarquee() {
+  const row = (dup: boolean) => (
+    <ul aria-hidden={dup || undefined} className={cn('flex shrink-0 items-center gap-3 pr-3', dup && 'marquee-dup')}>
+      {BUSINESS_TYPES.map(([I, label]) => (
+        <li key={label} className="inline-flex h-12 items-center gap-2.5 whitespace-nowrap rounded-full border border-line bg-surface px-5 text-[15px] font-semibold text-ink">
+          <I size={19} className="text-brand" aria-hidden /> {label}
+        </li>
+      ))}
+    </ul>
+  );
+  return (
+    <section aria-label="Cocok untuk" className="mx-auto max-w-[1200px] px-5 pt-20 md:px-8 md:pt-28">
+      <p className="text-center text-[15px] font-semibold text-ink-3">Cocok untuk usaha seperti</p>
+      <div className="marquee mt-5 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
+        <div className="marquee-track">
+          {row(false)}
+          {row(true)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const FACTS = [
+  ['EGP', 'Semua harga, laporan, dan struk dalam pound Mesir'],
+  ['7', 'Cara bayar Mesir, dari cash sampai Vodafone Cash'],
+  ['Kairo', 'Tutup buku harian ikut jam Mesir, termasuk musim panas'],
+  ['Gratis', 'Daftar tanpa kartu kredit, jalan di HP tanpa mesin kasir'],
+] as const;
+
+/** Fakta produk dalam pita merek, tanpa kartu */
+export function FactsBand() {
+  return (
+    <section className="px-2.5 pt-24 md:px-4 md:pt-32">
+      <div className="relative isolate overflow-hidden rounded-[32px] bg-[var(--deep)] px-5 py-14 text-[var(--on-deep)] md:rounded-[40px] md:px-8 md:py-20">
+        <span aria-hidden className="brand-rings -bottom-56 -right-32 -z-10 size-[480px] border-[72px]" />
+        <div className="mx-auto max-w-[1200px]">
+          <h2 className="max-w-[22ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">
+            Dibuat untuk cara jualan <span className="text-lime">Masisir</span>.
+          </h2>
+          <dl className="mt-12 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            {FACTS.map(([big, text]) => (
+              <div key={big} className="border-t border-white/15 pt-5">
+                <dt className="text-[44px] font-bold leading-none tracking-[-0.04em] text-lime md:text-[52px]">{big}</dt>
+                <dd className="mt-3 max-w-[26ch] text-[15px] leading-relaxed text-[var(--on-deep-2)]">{text}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Footer merek: wordmark besar dan tautan */
+export function BrandFooter({ onAuth }: { onAuth: (mode: 'login' | 'register') => void }) {
+  const link = 'text-[15px] font-semibold text-[var(--on-deep-2)] hover:text-[var(--on-deep)]';
+  return (
+    <footer className="px-2.5 pb-2.5 md:px-4 md:pb-4">
+      <div className="relative isolate overflow-hidden rounded-[32px] bg-[var(--deep-2)] px-5 pb-8 pt-14 text-[var(--on-deep)] md:rounded-[40px] md:px-8">
+        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 md:grid-cols-[minmax(0,1.4fr)_repeat(2,minmax(0,1fr))]">
+          <div>
+            <span className="[&_span.text-ink]:text-[var(--on-deep)]">
+              <Logo size={36} />
+            </span>
+            <p className="mt-4 max-w-[36ch] text-[15px] leading-relaxed text-[var(--on-deep-2)]">
+              Kasir, stok, piutang, dan laporan untuk usaha mahasiswa Indonesia di Mesir.
+            </p>
+          </div>
+          <nav aria-label="Produk" className="grid content-start gap-3">
+            <p className="text-[13px] font-bold text-[var(--on-deep)]">Produk</p>
+            <a href="#fitur" className={link}>Fitur</a>
+            <a href="#testimoni" className={link}>Testimoni</a>
+          </nav>
+          <nav aria-label="Akun" className="grid content-start gap-3">
+            <p className="text-[13px] font-bold text-[var(--on-deep)]">Akun</p>
+            <button type="button" onClick={() => onAuth('login')} className={cn(link, 'text-left')}>Masuk</button>
+            <button type="button" onClick={() => onAuth('register')} className={cn(link, 'text-left')}>Daftar gratis</button>
+          </nav>
+        </div>
+        <p aria-hidden className="mx-auto mt-14 max-w-[1200px] select-none text-[clamp(96px,22vw,300px)] font-extrabold leading-[0.95] tracking-[-0.06em] text-lime/90">
+          possir
+        </p>
+        <p className="mx-auto mt-8 max-w-[1200px] text-[13px] text-[var(--on-deep-2)]">© 2026 Possir. Untuk warung rumahan, katering, frozen food, jastip, dan usaha Masisir lainnya.</p>
+      </div>
+    </footer>
   );
 }

@@ -278,3 +278,55 @@
     display: none !important;
   }
 }
+
+/* ---------------------------------------------------------------------
+   Landing: panel merek hijau Nil tua. Teks di atasnya >= 7:1.
+   --------------------------------------------------------------------- */
+:root {
+  --deep: #123f31;
+  --deep-2: #0c2f24;
+  --on-deep: #f1f6f2;
+  --on-deep-2: #b9d0c4;
+}
+[data-theme="dark"] {
+  --deep: #112a21;
+  --deep-2: #0a1c16;
+  --on-deep: #e8efea;
+  --on-deep-2: #a8bdb2;
+}
+
+/* Motif cincin dari logo "p", dipakai sebagai latar panel merek */
+.brand-rings {
+  position: absolute;
+  border-radius: 9999px;
+  border-style: solid;
+  border-color: color-mix(in oklab, var(--lime) 14%, transparent);
+  pointer-events: none;
+}
+
+/* Satu-satunya marquee di halaman: jenis usaha yang cocok. Berhenti saat reduced motion. */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-dup {
+    display: none;
+  }
+}
