@@ -28,7 +28,7 @@ import { TESTIMONIALS } from './testimonials';
 /** Bingkai tipis untuk screenshot layar lebar */
 export function DesktopShot({ src, alt, eager, className }: { src: string; alt: string; eager?: boolean; className?: string }) {
   return (
-    <div className={cn('overflow-hidden rounded-[22px] border border-line bg-surface p-1.5 shadow-[var(--shadow-float)]', className)}>
+    <div className={cn('overflow-hidden rounded-[26px] border border-line bg-surface p-2.5 shadow-[var(--shadow-float)] md:p-3.5', className)}>
       <img
         src={src}
         alt={alt}
@@ -37,7 +37,7 @@ export function DesktopShot({ src, alt, eager, className }: { src: string; alt: 
         loading={eager ? 'eager' : 'lazy'}
         fetchPriority={eager ? 'high' : 'auto'}
         decoding="async"
-        className="block h-auto w-full rounded-[16px]"
+        className="block h-auto w-full rounded-[14px] ring-1 ring-line"
       />
     </div>
   );
@@ -46,7 +46,7 @@ export function DesktopShot({ src, alt, eager, className }: { src: string; alt: 
 /** Bingkai HP untuk screenshot 390 x 844 */
 export function PhoneShot({ src, alt, eager, className }: { src: string; alt: string; eager?: boolean; className?: string }) {
   return (
-    <div className={cn('rounded-[42px] bg-ink p-[7px] shadow-[var(--shadow-float)] dark:bg-surface-3', className)}>
+    <div className={cn('rounded-[46px] bg-ink p-[11px] shadow-[var(--shadow-float)] dark:bg-surface-3', className)}>
       <img
         src={src}
         alt={alt}
@@ -100,7 +100,7 @@ const TABS: Array<{
   {
     key: 'piutang',
     icon: HandCoins,
-    title: 'Hutang teman tercatat',
+    title: 'Hutang customer tercatat',
     body: 'Buku kas bon per pelanggan, bayar sebagian, dan pengingat WhatsApp dengan satu ketukan.',
     shot: { src: '/screens/piutang-mobile.webp', alt: 'Halaman piutang Possir di HP', phone: true },
   },
@@ -185,10 +185,11 @@ export function FeatureTour() {
                   <span className={cn('mt-1 block text-[14px] leading-relaxed text-ink-2', !on && 'max-lg:hidden')}>{t.body}</span>
                 </span>
                 {auto && on && (
-                  <span aria-hidden className="absolute inset-x-5 bottom-2 h-[3px] overflow-hidden rounded-full bg-surface-3">
+                  // pengatur waktu tak terlihat: animasi CSS 6 detik yang ikut tertahan saat hover/fokus/di luar layar
+                  <span aria-hidden className="pointer-events-none absolute size-px opacity-0">
                     <span
                       key={active}
-                      className="tour-progress block h-full rounded-full bg-brand"
+                      className="tour-progress block size-px"
                       data-paused={hold || !inView}
                       onAnimationEnd={next}
                     />
@@ -437,10 +438,10 @@ export function BrandFooter({ onAuth }: { onAuth: (mode: 'login' | 'register') =
             <button type="button" onClick={() => onAuth('register')} className={cn(link, 'text-left')}>Daftar gratis</button>
           </nav>
         </div>
-        <p aria-hidden className="mx-auto mt-14 max-w-[1200px] select-none text-[clamp(96px,22vw,300px)] font-extrabold leading-[0.95] tracking-[-0.06em] text-lime/90">
+        <p aria-hidden className="mx-auto mt-14 max-w-[1200px] select-none pb-[0.08em] text-[clamp(96px,22vw,300px)] font-extrabold leading-[0.95] tracking-[-0.06em] text-lime/90">
           possir
         </p>
-        <p className="mx-auto mt-8 max-w-[1200px] text-[13px] text-[var(--on-deep-2)]">© 2026 Possir. Untuk warung rumahan, katering, frozen food, jastip, dan usaha Masisir lainnya.</p>
+        <p className="mx-auto mt-10 max-w-[1200px] border-t border-white/10 pt-6 text-[13px] text-[var(--on-deep-2)] md:mt-14">© 2026 Possir. Untuk warung rumahan, katering, frozen food, jastip, dan usaha Masisir lainnya.</p>
       </div>
     </footer>
   );

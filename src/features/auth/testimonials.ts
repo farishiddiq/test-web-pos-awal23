@@ -9,7 +9,7 @@ export interface Testimonial {
 
 export const TESTIMONIALS: Testimonial[] = [
   {
-    quote: 'Dulu hutang teman cuma diingat. Sekarang tinggal buka Piutang, kirim pengingat WhatsApp, beres.',
+    quote: 'Dulu hutang customer cuma diingat. Sekarang tinggal buka Piutang, kirim pengingat WhatsApp, beres.',
     name: 'Rizka Amalia',
     business: 'Katering rumahan',
     place: 'Hay Asyir',

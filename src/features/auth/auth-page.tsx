@@ -56,7 +56,7 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
                 Kasir untuk usaha <span className="text-lime">Masisir</span>.
               </h1>
               <p style={{ '--i': 2 } as CSSProperties} className="hero-in mt-5 max-w-[42ch] text-[16px] leading-relaxed text-[var(--on-deep-2)] md:text-[17.5px]">
-                Catat penjualan, stok, hutang teman, dan untung usahamu dari HP. Semua dalam EGP.
+                Catat penjualan, stok, hutang customer, dan untung usahamu dari HP. Semua dalam EGP.
               </p>
               <div style={{ '--i': 3 } as CSSProperties} className="hero-in mt-8 flex flex-wrap gap-3 max-lg:hidden">
                 <button type="button" onClick={() => openAuth('register')} className="pressable inline-flex h-14 items-center gap-2 rounded-full bg-lime px-7 text-[16px] font-bold text-on-lime hover:brightness-105">

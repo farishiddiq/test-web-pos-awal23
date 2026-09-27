@@ -153,7 +153,7 @@ function BottomNav() {
   const { pathname } = useLocation();
   const inMenu = MENU_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   return (
-    <nav aria-label="Menu utama" className="no-print material fixed inset-x-0 bottom-0 z-40 border-t border-line/70 md:hidden safe-bottom">
+    <nav aria-label="Menu utama" className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface shadow-[0_-8px_24px_-16px_rgb(21_32_27/0.25)] md:hidden safe-bottom">
       <div className="mx-auto grid h-[64px] max-w-md grid-cols-5 items-stretch px-1">
         <Tab to="/" label="Beranda" icon={House} end />
         <Tab to="/transaksi" label="Transaksi" icon={Receipt} />

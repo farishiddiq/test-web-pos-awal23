@@ -63,7 +63,7 @@ export function CustomerFormSheet({
           <TextInput id="c-phone" type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="010 1234 5678" />
         </Field>
         <Field label="Catatan" htmlFor="c-note" optional>
-          <TextArea id="c-note" rows={2} value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} placeholder="Misal: asrama, lantai, atau teman siapa" />
+          <TextArea id="c-note" rows={2} value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} placeholder="Misal: asrama, lantai, atau langganan sejak kapan" />
         </Field>
       </form>
     </Sheet>
