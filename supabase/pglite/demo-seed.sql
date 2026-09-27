@@ -42,12 +42,12 @@ insert into private.seed_catalog (name, price, cost, unit, min_stock, color, sku
   ('Indomie Soto Mie',               22,  15, 'pcs',     30, 'sand',  'IDM-SOT', 'Mie instan',      true,   8, 40, 64, 'grosir', null, null),
   ('Mie Sedaap Goreng',              21,  14, 'pcs',     30, 'lime',  'SDP-GRG', 'Mie instan',      true,   6, 40, 58, 'grosir', null, null),
   ('Samyang Buldak Hot Chicken',     85,  62, 'pcs',     10, 'rose',  'SMY-HOT', 'Mie instan',      false,  5, 10,  4, 'import', 'lost', 'Stock opname: selisih hitung'),
-  ('Kecap Manis Bango 220 ml',      115,  82, 'botol',    6, 'stone', 'BGO-220', 'Bumbu & saus',    false,  5, 12,  2, 'grosir', 'damaged', 'Stock opname: botol retak'),
-  ('Sambal ABC Extra Pedas 335 ml',  95,  66, 'botol',    6, 'rose',  'ABC-335', 'Bumbu & saus',    false,  4, 12, 14, 'grosir', null, null),
+  ('Kecap Manis Bango 220 ml',      115,  82, 'botol',    6, 'stone', 'BGO-220', 'Bumbu & saus',    false,  5, 12,  2, 'jastip', 'damaged', 'Stock opname: botol retak'),
+  ('Sambal ABC Extra Pedas 335 ml',  95,  66, 'botol',    6, 'rose',  'ABC-335', 'Bumbu & saus',    false,  4, 12, 14, 'jastip', null, null),
   ('Bumbu Racik Nasi Goreng',        18,  11, 'sachet',  20, 'sand',  'RCK-NGR', 'Bumbu & saus',    true,   5, 24, 45, 'grosir', null, null),
-  ('Royco Kaldu Ayam 94 g',          45,  31, 'bungkus',  8, 'peach', 'RYC-94',  'Bumbu & saus',    false,  3, 12, 17, 'grosir', null, null),
-  ('Saus Tiram Saori 133 ml',        80,  56, 'botol',    5, 'stone', 'SAO-133', 'Bumbu & saus',    false,  2,  6,  9, 'grosir', null, null),
-  ('Kerupuk Udang Finna 200 g',      85,  58, 'bungkus',  6, 'peach', 'FIN-200', 'Camilan',         false,  4, 12,  3, 'grosir', 'damaged', 'Stock opname: melempem'),
+  ('Royco Kaldu Ayam 94 g',          45,  31, 'bungkus',  8, 'peach', 'RYC-94',  'Bumbu & saus',    false,  3, 12, 17, 'jastip', null, null),
+  ('Saus Tiram Saori 133 ml',        80,  56, 'botol',    5, 'stone', 'SAO-133', 'Bumbu & saus',    false,  2,  6,  9, 'jastip', null, null),
+  ('Kerupuk Udang Finna 200 g',      85,  58, 'bungkus',  6, 'peach', 'FIN-200', 'Camilan',         false,  4, 12,  3, 'jastip', 'damaged', 'Stock opname: melempem'),
   ('Chitato Sapi Panggang 68 g',     55,  37, 'bungkus',  8, 'sand',  'CHT-68',  'Camilan',         false,  4, 12, 20, 'grosir', null, null),
   ('Beng-Beng',                      14,   9, 'pcs',     24, 'stone', 'BNG-20',  'Camilan',         true,   5, 24, 60, 'grosir', null, null),
   ('Nori Snack Tao Kae Noi',         40,  27, 'bungkus', 10, 'lime',  'TKN-NRI', 'Camilan',         false,  3, 12, 22, 'import', null, null),
@@ -92,6 +92,8 @@ declare
   v_sup_grosir uuid;
   v_sup_import uuid;
   v_sup_frozen uuid;
+  v_sup_jastip uuid;
+  v_span     integer;
   v_sup      uuid;
   v_week     date;
   v_hours    integer[] := array[0, 0, 9, 10, 11, 12, 13, 13, 14, 15, 16, 16, 17, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23];
@@ -301,13 +303,19 @@ begin
   -- pemasok
   v_sup_grosir := (public.upsert_supplier(v_b, '{"name":"Grosir Indo Hay Asyir","phone":"01002 615 480","note":"Mie, bumbu, dan camilan Indonesia per karton. Buka sampai Isya."}'::jsonb) ->> 'id')::uuid;
   v_sup_import := (public.upsert_supplier(v_b, '{"name":"Asia Import Abbas El Akkad","phone":"01223 408 761","note":"Barang Korea, Thailand, dan beras. Bisa tempo 2 minggu."}'::jsonb) ->> 'id')::uuid;
+  v_sup_jastip := (public.upsert_supplier(v_b, '{"name":"Jastip Koper Mbak Dewi (Jakarta)","phone":"0812 9051 3378","note":"Titip koper Jakarta-Kairo tiap 2 minggu: kecap, sambal, bumbu, kerupuk. Bayar transfer."}'::jsonb) ->> 'id')::uuid;
   v_sup_frozen := (public.upsert_supplier(v_b, '{"name":"Frozen Madinat Nasr","phone":"01550 937 214","note":"Tempe dan bakso beku, antar tiap Selasa pagi"}'::jsonb) ->> 'id')::uuid;
 
-  -- Restock mingguan: jumlah = penjualan minggu itu, dibulatkan ke atas ke isi karton.
+  -- Restock: grosir, impor, dan frozen tiap minggu; jastip koper dari Jakarta tiap 2 minggu.
+  -- Jumlah = penjualan periode itu, dibulatkan ke atas ke isi karton.
   -- Barang yang sengaja menipis tidak ikut restock terakhir.
   for v_week in select d::date from generate_series(v_today - 34, v_today - 6, interval '7 days') d loop
-    foreach v_name in array array['grosir', 'import', 'frozen'] loop
-      select coalesce(jsonb_agg(jsonb_build_object('product_id', x.id, 'qty', x.qty, 'unit_cost', x.cost) order by x.name), '[]'::jsonb)
+    foreach v_name in array array['grosir', 'import', 'frozen', 'jastip'] loop
+      continue when v_name = 'jastip' and (v_today - v_week) not in (34, 20, 6);
+      v_span := case v_name when 'jastip' then 14 else 7 end;
+      -- titipan dari Indonesia sedikit lebih murah dari grosir lokal, sudah termasuk ongkos titip
+      select coalesce(jsonb_agg(jsonb_build_object('product_id', x.id, 'qty', x.qty,
+               'unit_cost', case when v_name = 'jastip' then round(x.cost * 0.92) else x.cost end) order by x.name), '[]'::jsonb)
       into v_items
       from (
         select c.id, c.name, c.cost,
@@ -317,20 +325,22 @@ begin
                     else greatest(floor(sum(-m.qty_change) * 0.9 / c.case_qty), 1) * c.case_qty end as qty
         from private.seed_catalog c
         join public.stock_movements m on m.product_id = c.id and m.type = 'sale'
-          and m.created_at >= private.day_start(v_week, c_tz) and m.created_at < private.day_start(v_week + 7, c_tz)
+          and m.created_at >= private.day_start(v_week, c_tz) and m.created_at < private.day_start(v_week + v_span, c_tz)
         where c.supplier = v_name and not (c.reason is not null and v_week = v_today - 6)
         group by c.id, c.name, c.cost, c.case_qty, c.reason
       ) x;
       continue when jsonb_array_length(v_items) = 0;
-      v_sup := case v_name when 'grosir' then v_sup_grosir when 'import' then v_sup_import else v_sup_frozen end;
+      v_sup := case v_name when 'grosir' then v_sup_grosir when 'import' then v_sup_import
+                           when 'jastip' then v_sup_jastip else v_sup_frozen end;
       if v_name = 'import' and v_week = v_today - 13 then
         -- dibayar sebagian: jadi hutang ke pemasok
         perform private.seed_purchase(v_b, v_sup, v_week, '9 hours 30 minutes', 1000, 'cash', v_items, 'Bayar sebagian, sisanya tempo 2 minggu');
       else
         perform private.seed_purchase(v_b, v_sup, v_week, '9 hours 30 minutes', null,
-          case v_name when 'grosir' then 'cash' when 'import' then 'instapay' else 'vodafone_cash' end, v_items,
+          case v_name when 'grosir' then 'cash' when 'import' then 'instapay' when 'jastip' then 'bank_transfer' else 'vodafone_cash' end, v_items,
           case v_name when 'grosir' then 'Restock mingguan, angkut pakai Uber'
                       when 'import' then 'Barang impor, cek tanggal kedaluwarsa'
+                      when 'jastip' then 'Koper 23 kg tiba di Kairo, sudah termasuk ongkos titip'
                       else 'Diantar ke flat, langsung masuk freezer' end);
       end if;
     end loop;
@@ -353,7 +363,8 @@ begin
                  sum(mm.qty_change) over (order by mm.created_at, mm.id) as running
           from public.stock_movements mm
           where mm.product_id = v_p.product_id) m;
-    v_initial := greatest(v_p.target - v_net, -v_min + 1);
+    -- barang menipis: sisakan 2 untuk dicatat sebagai hasil stock opname
+    v_initial := greatest(v_p.target - v_net + case when v_p.reason is null then 0 else 2 end, -v_min + 1);
     insert into public.stock_movements (business_id, product_id, type, qty_change, qty_after, unit_cost,
                                         created_by, created_by_name, created_at)
     values (v_b, v_p.product_id, 'initial', v_initial, 0, v_p.cost_price, c_owner, 'Ahmad',
@@ -405,8 +416,6 @@ begin
     'note', 'Paket data HP toko (WE)', 'spent_on', v_today - 26, 'method_code', 'vodafone_cash'));
   perform public.save_expense(v_b, jsonb_build_object('category', 'Perlengkapan', 'amount', 220,
     'note', 'Rak plastik susun untuk mie', 'spent_on', v_today - 16, 'method_code', 'cash'));
-  perform public.save_expense(v_b, jsonb_build_object('category', 'Ongkir', 'amount', 900,
-    'note', 'Titip koper Jakarta-Kairo (bumbu dan kecap)', 'spent_on', v_today - 27, 'method_code', 'instapay'));
   perform public.save_expense(v_b, jsonb_build_object('category', 'Sewa', 'amount', 600,
     'note', 'Sewa rak gudang di flat', 'spent_on', v_today - 25, 'method_code', 'cash'));
   perform public.save_expense(v_b, jsonb_build_object('category', 'Listrik', 'amount', 280,
