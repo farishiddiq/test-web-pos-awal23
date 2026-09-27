@@ -9,7 +9,7 @@
 -- Pembelian yang tanggalnya dimundurkan (hanya untuk seed)
 create or replace function private.seed_purchase(
   p_business_id uuid, p_supplier_id uuid, p_day date, p_time interval,
-  p_paid numeric, p_method text, p_items jsonb)
+  p_paid numeric, p_method text, p_items jsonb, p_note text default null)
 returns void
 language plpgsql
 set search_path = ''
@@ -20,7 +20,7 @@ declare
 begin
   v_id := (public.create_purchase(p_business_id, jsonb_strip_nulls(jsonb_build_object(
     'supplier_id', p_supplier_id, 'purchased_on', p_day, 'items', p_items,
-    'paid_amount', p_paid, 'method_code', p_method))) ->> 'id')::uuid;
+    'paid_amount', p_paid, 'method_code', p_method, 'note', p_note))) ->> 'id')::uuid;
   update public.purchases set created_at = v_ts where id = v_id;
   update public.stock_movements set created_at = v_ts where purchase_id = v_id;
 end;
@@ -94,7 +94,7 @@ declare
   v_sup_frozen uuid;
   v_sup      uuid;
   v_week     date;
-  v_hours    integer[] := array[10, 11, 12, 13, 13, 14, 15, 16, 16, 17, 18, 19, 19, 20, 20, 21, 21, 22];
+  v_hours    integer[] := array[0, 0, 9, 10, 11, 12, 13, 13, 14, 15, 16, 16, 17, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23];
   v_net      numeric;
   v_min      numeric;
   v_last     timestamptz;
@@ -141,38 +141,43 @@ begin
     end if;
   end loop;
 
-  -- pelanggan langganan (tanpa nomor HP supaya demo tidak mengirim WA ke orang sungguhan)
+  -- metode bayar yang juga dipakai toko ini
+  update public.payment_methods set is_active = true
+  where business_id = v_b and code in ('orange_cash', 'bank_transfer');
+
+  -- Pelanggan langganan. Nomor HP contoh; di mode demo tombol WhatsApp tidak memakai nomor
+  -- (aplikasi membuka pilihan kontak), jadi tidak ada pesan terkirim ke orang sungguhan.
   v_customers := array[
-    (public.upsert_customer(v_b, '{"name":"Abdullah Syakir","note":"Asrama Buuts, lantai 3"}'::jsonb) ->> 'id')::uuid,
-    (public.upsert_customer(v_b, '{"name":"Mahmoud Adel","note":"Tetangga flat sebelah"}'::jsonb) ->> 'id')::uuid,
-    (public.upsert_customer(v_b, '{"name":"Nabila Putri"}'::jsonb) ->> 'id')::uuid,
-    (public.upsert_customer(v_b, '{"name":"Hasan Basri","note":"Biasa bayar tiap awal bulan"}'::jsonb) ->> 'id')::uuid,
-    (public.upsert_customer(v_b, '{"name":"Aisyah Rahmawati","note":"Borong mie untuk flat"}'::jsonb) ->> 'id')::uuid,
-    (public.upsert_customer(v_b, '{"name":"Faris Hidayat"}'::jsonb) ->> 'id')::uuid,
-    (public.upsert_customer(v_b, '{"name":"Zaid Alatas"}'::jsonb) ->> 'id')::uuid];
-  -- yang sering ngutang: Abdullah, Hasan, Nabila
+    (public.upsert_customer(v_b, '{"name":"Abdullah Syakir","phone":"01012 438 915","note":"Asrama Buuts, lantai 3, kamar 12"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Mahmoud Adel","phone":"01148 207 336","note":"Tetangga flat sebelah, orang Mesir"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Nabila Putri","phone":"0812 8834 1207","note":"Kuliah pagi, ambil barang sore"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Hasan Basri","phone":"01553 091 842","note":"Biasa bayar tiap awal bulan setelah kiriman"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Aisyah Rahmawati","phone":"01276 514 093","note":"Borong mie untuk flat putri Hay Sabi"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Faris Hidayat","phone":"01093 772 158","note":"Pengurus kekeluargaan, sering pesan untuk acara"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Zaid Alatas","phone":"0857 3310 4462"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Umar Fadhlurrahman","phone":"01024 663 870","note":"Minta antar ke Rabaa"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Salma Nurhaliza","phone":"01117 390 425"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Karim Mostafa","phone":"01228 846 017","note":"Suka Samyang dan nori"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Rahmat Hidayatullah","phone":"01065 218 734","note":"Asrama Madinatul Bu''uts"}'::jsonb) ->> 'id')::uuid,
+    (public.upsert_customer(v_b, '{"name":"Fatimah Az-Zahra","phone":"0813 5527 9018","note":"Pesan beras tiap bulan"}'::jsonb) ->> 'id')::uuid];
+  -- yang sering ngutang: Abdullah, Hasan, Nabila, Mahmoud
   v_debtors := array_fill(v_customers[1], array[4]) || array_fill(v_customers[4], array[3])
             || array_fill(v_customers[3], array[3]) || array_fill(v_customers[2], array[2])
-            || array[v_customers[5], v_customers[6], v_customers[7]];
+            || array[v_customers[5], v_customers[6], v_customers[7], v_customers[8]];
 
-  -- penjualan 35 hari terakhir
+  -- Penjualan 35 hari terakhir. Toko buka 09.00 sampai lewat tengah malam: mahasiswa Kairo
+  -- sering belanja mie jam 12 malam, jadi 00.xx tetap ada.
   for v_day in select d::date from generate_series(v_today - 34, v_today, interval '1 day') d loop
     v_n := 7 + floor(random() * 6)::integer
          + case when extract(isodow from v_day) in (4, 5) then 4 else 0 end;  -- Kamis-Jumat lebih ramai
     if v_day = v_today then
-      v_n := 5 + floor(random() * 4)::integer;
+      v_n := 14;  -- banyak yang dilewati karena masih di masa depan
     end if;
 
     for v_i in 1..v_n loop
-      if v_day = v_today then
-        v_ts := v_now - interval '6 minutes'
-              - random() * least(v_now - private.day_start(v_today, c_tz) - interval '10 minutes', interval '9 hours');
-        continue when v_ts < private.day_start(v_today, c_tz);
-      else
-        v_ts := private.day_start(v_day, c_tz)
-              + make_interval(hours => v_hours[1 + floor(random() * array_length(v_hours, 1))::integer],
-                              mins => floor(random() * 60)::integer, secs => floor(random() * 60)::integer);
-      end if;
+      v_ts := private.day_start(v_day, c_tz)
+            + make_interval(hours => v_hours[1 + floor(random() * array_length(v_hours, 1))::integer],
+                            mins => floor(random() * 60)::integer, secs => floor(random() * 60)::integer);
       continue when v_ts > v_now - interval '4 minutes';
 
       -- belanjaan 1-5 jenis barang; mie dan sachet biasanya dibeli beberapa sekaligus
@@ -194,22 +199,41 @@ begin
       if random() < 0.06 then
         v_items := v_items || '[{"name":"Kantong belanja besar","qty":1,"unit_price":5,"unit_cost":2}]'::jsonb;
       end if;
+      if random() < 0.04 then
+        v_items := v_items || '[{"name":"Ongkos antar","qty":1,"unit_price":15,"unit_cost":0}]'::jsonb;
+      end if;
 
       v_r := random();
-      v_method := case when v_r < 0.46 then 'cash' when v_r < 0.72 then 'instapay'
-                       when v_r < 0.90 then 'vodafone_cash' else 'hutang' end;
-      v_payload := jsonb_build_object('items', v_items, 'payment_method', v_method,
-                                      'discount', case when random() < 0.05 then 5 else 0 end);
+      v_method := case when v_r < 0.42 then 'cash' when v_r < 0.66 then 'instapay'
+                       when v_r < 0.82 then 'vodafone_cash' when v_r < 0.86 then 'orange_cash'
+                       when v_r < 0.89 then 'bank_transfer' else 'hutang' end;
+      v_payload := jsonb_build_object('items', v_items, 'payment_method', v_method);
+
+      -- pelanggan: hutang selalu bernama; sekitar seperlima pembeli lain adalah langganan
       if v_method = 'hutang' then
         v_cust := v_debtors[1 + floor(random() * array_length(v_debtors, 1))::integer];
         v_payload := v_payload || jsonb_build_object(
           'customer_id', v_cust,
           'due_date', case when random() < 0.5 then null else to_char(v_day + 7, 'YYYY-MM-DD') end);
+      elsif random() < 0.22 then
+        v_cust := v_customers[1 + floor(random() * array_length(v_customers, 1))::integer];
+        v_payload := v_payload || jsonb_build_object('customer_id', v_cust);
       end if;
 
-      -- sekitar sepertiga transaksi dilayani kasir
+      -- catatan sesekali
+      v_r := random();
+      if v_r < 0.09 then
+        v_payload := v_payload || jsonb_build_object('note', (array[
+          'Antar ke Buuts lantai 3', 'Diambil sore setelah kuliah', 'Titip untuk flat 12',
+          'Borongan untuk acara kekeluargaan', 'Minta dibungkus rapi, buat oleh-oleh',
+          'Bayar pas, tanpa kembalian', 'Pesan lewat WA'])[1 + floor(random() * 7)::integer]);
+      end if;
+
+      -- sale dulu tanpa diskon untuk tahu totalnya; borongan besar kadang dapat potongan
       perform set_config('request.jwt.claim.sub', (case when random() < 0.32 then c_cashier else c_owner end)::text, false);
-      v_sale := public.create_sale(v_b, v_payload);
+      v_sale := public.create_sale(v_b, v_payload || jsonb_build_object('discount',
+        case when random() < 0.25 and v_lines >= 3 then (array[5, 10, 10, 15, 20])[1 + floor(random() * 5)::integer]
+             when random() < 0.03 then 5 else 0 end));
       perform set_config('request.jwt.claim.sub', c_owner::text, false);
 
       v_sale_id := (v_sale ->> 'id')::uuid;
@@ -217,7 +241,7 @@ begin
       update public.stock_movements set created_at = v_ts where sale_id = v_sale_id;
       update public.customer_debts set created_at = v_ts where sale_id = v_sale_id;
 
-      if (v_sale ->> 'payment_method_code') = 'cash' and random() < 0.4 then
+      if (v_sale ->> 'payment_method_code') = 'cash' and random() < 0.55 then
         v_total := (v_sale ->> 'total')::numeric;
         update public.sales set cash_received = ceil(v_total / 50) * 50 + case when random() < 0.3 then 50 else 0 end
         where id = v_sale_id;
@@ -239,7 +263,7 @@ begin
     if v_age > 7 then
       continue when v_r > 0.97;
     else
-      continue when v_r > 0.45;
+      continue when v_r > 0.3;
     end if;
     insert into public.debt_payments (business_id, customer_id, amount, method_code, method_name,
                                       created_by, created_by_name, created_at)
@@ -250,6 +274,12 @@ begin
   end loop;
   update public.debt_payments set method_name = case method_code when 'cash' then 'Cash' else 'InstaPay' end
   where business_id = v_b;
+
+  -- kasbon di luar transaksi: uang dipinjam, bukan barang
+  perform public.add_customer_debt(v_b, v_customers[6], 250, 'Kasbon uang untuk bayar tiket acara', v_today + 5);
+  update public.customer_debts set created_at = private.day_start(v_today - 3, c_tz) + interval '20 hours 15 minutes'
+  where customer_id = v_customers[6] and sale_id is null;
+
 
   -- dua transaksi dibatalkan, dengan jejak audit
   select id into v_sale_id from public.sales
@@ -269,9 +299,9 @@ begin
   where sale_id = v_sale_id and type = 'sale_void';
 
   -- pemasok
-  v_sup_grosir := (public.upsert_supplier(v_b, '{"name":"Grosir Indo Hay Asyir","note":"Mie, bumbu, dan camilan Indonesia per karton"}'::jsonb) ->> 'id')::uuid;
-  v_sup_import := (public.upsert_supplier(v_b, '{"name":"Asia Import Abbas El Akkad","note":"Barang Korea, Thailand, dan beras"}'::jsonb) ->> 'id')::uuid;
-  v_sup_frozen := (public.upsert_supplier(v_b, '{"name":"Frozen Madinat Nasr","note":"Tempe dan bakso beku, antar tiap Selasa"}'::jsonb) ->> 'id')::uuid;
+  v_sup_grosir := (public.upsert_supplier(v_b, '{"name":"Grosir Indo Hay Asyir","phone":"01002 615 480","note":"Mie, bumbu, dan camilan Indonesia per karton. Buka sampai Isya."}'::jsonb) ->> 'id')::uuid;
+  v_sup_import := (public.upsert_supplier(v_b, '{"name":"Asia Import Abbas El Akkad","phone":"01223 408 761","note":"Barang Korea, Thailand, dan beras. Bisa tempo 2 minggu."}'::jsonb) ->> 'id')::uuid;
+  v_sup_frozen := (public.upsert_supplier(v_b, '{"name":"Frozen Madinat Nasr","phone":"01550 937 214","note":"Tempe dan bakso beku, antar tiap Selasa pagi"}'::jsonb) ->> 'id')::uuid;
 
   -- Restock mingguan: jumlah = penjualan minggu itu, dibulatkan ke atas ke isi karton.
   -- Barang yang sengaja menipis tidak ikut restock terakhir.
@@ -295,10 +325,13 @@ begin
       v_sup := case v_name when 'grosir' then v_sup_grosir when 'import' then v_sup_import else v_sup_frozen end;
       if v_name = 'import' and v_week = v_today - 13 then
         -- dibayar sebagian: jadi hutang ke pemasok
-        perform private.seed_purchase(v_b, v_sup, v_week, '9 hours 30 minutes', 1000, 'cash', v_items);
+        perform private.seed_purchase(v_b, v_sup, v_week, '9 hours 30 minutes', 1000, 'cash', v_items, 'Bayar sebagian, sisanya tempo 2 minggu');
       else
         perform private.seed_purchase(v_b, v_sup, v_week, '9 hours 30 minutes', null,
-          case v_name when 'grosir' then 'cash' when 'import' then 'instapay' else 'vodafone_cash' end, v_items);
+          case v_name when 'grosir' then 'cash' when 'import' then 'instapay' else 'vodafone_cash' end, v_items,
+          case v_name when 'grosir' then 'Restock mingguan, angkut pakai Uber'
+                      when 'import' then 'Barang impor, cek tanggal kedaluwarsa'
+                      else 'Diantar ke flat, langsung masuk freezer' end);
       end if;
     end loop;
   end loop;
@@ -357,6 +390,21 @@ begin
         'method_code', case when random() < 0.5 then 'cash' else 'vodafone_cash' end));
     end if;
   end loop;
+  -- upah Rizki yang jaga toko sore, dibayar tiap Kamis
+  for v_day in select d::date from generate_series(v_today - 34, v_today, interval '1 day') d loop
+    if extract(isodow from v_day) = 4 then
+      perform public.save_expense(v_b, jsonb_build_object('category', 'Upah', 'amount', 350,
+        'note', 'Upah jaga toko Rizki seminggu', 'spent_on', v_day, 'method_code', 'instapay'));
+    end if;
+    if random() < 0.08 then
+      perform public.save_expense(v_b, jsonb_build_object('category', 'Kebersihan', 'amount', 30 + floor(random() * 4) * 10,
+        'note', 'Sabun, tisu, dan kantong sampah', 'spent_on', v_day, 'method_code', 'cash'));
+    end if;
+  end loop;
+  perform public.save_expense(v_b, jsonb_build_object('category', 'Internet', 'amount', 175,
+    'note', 'Paket data HP toko (WE)', 'spent_on', v_today - 26, 'method_code', 'vodafone_cash'));
+  perform public.save_expense(v_b, jsonb_build_object('category', 'Perlengkapan', 'amount', 220,
+    'note', 'Rak plastik susun untuk mie', 'spent_on', v_today - 16, 'method_code', 'cash'));
   perform public.save_expense(v_b, jsonb_build_object('category', 'Ongkir', 'amount', 900,
     'note', 'Titip koper Jakarta-Kairo (bumbu dan kecap)', 'spent_on', v_today - 27, 'method_code', 'instapay'));
   perform public.save_expense(v_b, jsonb_build_object('category', 'Sewa', 'amount', 600,

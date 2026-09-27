@@ -188,7 +188,7 @@ try {
   await viewport(390, 844, true);
   await go('/', `document.body.innerText.includes('Penjualan hari ini')`);
   await shot('dashboard-mobile');
-  await go('/piutang', `document.body.innerText.includes('Hasan')`);
+  await go('/piutang', `document.body.innerText.includes('Belum dibayar')`);
   await shot('piutang-mobile');
   await go('/produk', `document.body.innerText.includes('Stok')`);
   await shot('produk-mobile');

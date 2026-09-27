@@ -1,3 +1,5 @@
+import { storage } from './util';
+
 // Nomor WhatsApp: mahasiswa Masisir biasanya punya nomor Mesir (01x) atau
 // nomor Indonesia (08x). wa.me butuh format internasional tanpa "+".
 export function toWhatsAppNumber(raw: string | null | undefined): string | null {
@@ -22,5 +24,8 @@ export function whatsAppLink(text: string, phone?: string | null): string {
 }
 
 export function openWhatsApp(text: string, phone?: string | null): void {
-  window.open(whatsAppLink(text, phone), '_blank', 'noopener,noreferrer');
+  // Nomor di data demo hanya contoh: jangan pernah membuka chat ke nomor itu.
+  // WhatsApp akan meminta pengguna memilih kontak sendiri.
+  const demo = storage.get<string | null>('possir.mode', null) === 'demo';
+  window.open(whatsAppLink(text, demo ? null : phone), '_blank', 'noopener,noreferrer');
 }
