@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import {
   Bank,
   CashRegister,
@@ -25,8 +25,11 @@ import { cn } from '@/lib/util';
  * Angka di kartu mini diambil dari data demo "Pasar Asia Ahmad".
  */
 export function AuthBrand({ className }: { className?: string }) {
+  const panelRef = useRef<HTMLElement>(null);
+  useDepthParallax(panelRef);
   return (
     <section
+      ref={panelRef}
       aria-label="Tentang POSSIR"
       className={cn(
         'brand-panel relative isolate flex min-w-0 flex-col overflow-hidden rounded-[26px] bg-[var(--deep)] px-6 pb-6 pt-6 text-[var(--on-deep)] md:px-10 md:pt-8 lg:min-h-0',
@@ -67,7 +70,7 @@ export function AuthBrand({ className }: { className?: string }) {
       <div className="relative mt-4 hidden min-h-0 flex-1 lg:block" aria-hidden>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="relative h-full max-h-[540px] py-3">
-            <div className="h-full rounded-[40px] bg-ink p-[9px] shadow-[0_30px_60px_-24px_rgb(0_0_0/0.6)] dark:bg-surface-3">
+            <div data-depth="4" style={i(0)} className="brand-in h-full rounded-[40px] bg-ink p-[9px] shadow-[0_30px_60px_-24px_rgb(0_0_0/0.6)] dark:bg-surface-3">
               <img
                 src="/screens/dashboard-mobile.webp"
                 alt=""
@@ -77,15 +80,24 @@ export function AuthBrand({ className }: { className?: string }) {
               />
             </div>
 
-            <SalesCard className="absolute right-[calc(100%-26px)] top-[9%] w-[190px] -rotate-2 xl:w-[210px]" />
-            <TransactionCard className="absolute bottom-[14%] right-[calc(100%-18px)] hidden w-[230px] rotate-1 xl:block" />
-            <StockCard className="absolute left-[calc(100%-26px)] top-[15%] w-[190px] rotate-2 xl:w-[205px]" />
-            <ReportCard className="absolute bottom-[10%] left-[calc(100%-18px)] hidden w-[225px] -rotate-1 xl:block" />
+            {/* pembungkus: posisi, muncul bertahap (translate/scale/opacity), dan kedalaman (transform) */}
+            <div data-depth="14" style={i(1)} className="brand-in absolute right-[calc(100%-26px)] top-[9%]">
+              <SalesCard className="w-[190px] -rotate-2 xl:w-[210px]" />
+            </div>
+            <div data-depth="10" style={i(2)} className="brand-in absolute left-[calc(100%-26px)] top-[15%]">
+              <StockCard className="w-[190px] rotate-2 xl:w-[205px]" />
+            </div>
+            <div data-depth="18" style={i(3)} className="brand-in absolute bottom-[14%] right-[calc(100%-18px)] hidden xl:block">
+              <TransactionCard className="w-[230px] rotate-1" />
+            </div>
+            <div data-depth="12" style={i(4)} className="brand-in absolute bottom-[10%] left-[calc(100%-18px)] hidden xl:block">
+              <ReportCard className="w-[225px] -rotate-1" />
+            </div>
 
-            <IconBubble className="absolute -left-[16%] top-[-1%]"><CashRegister size={20} weight="fill" /></IconBubble>
-            <IconBubble className="absolute -right-[16%] top-[-3%]"><Money size={20} weight="fill" /></IconBubble>
-            <IconBubble className="absolute -right-[12%] bottom-[-1%]"><Storefront size={20} weight="fill" /></IconBubble>
-            <IconBubble className="absolute -left-[12%] bottom-[-2%]"><Coins size={20} weight="fill" /></IconBubble>
+            <IconBubble depth={24} index={5} className="absolute -left-[16%] top-[-1%]"><CashRegister size={20} weight="fill" /></IconBubble>
+            <IconBubble depth={20} index={5} className="absolute -right-[16%] top-[-3%]"><Money size={20} weight="fill" /></IconBubble>
+            <IconBubble depth={22} index={6} className="absolute -right-[12%] bottom-[-1%]"><Storefront size={20} weight="fill" /></IconBubble>
+            <IconBubble depth={26} index={6} className="absolute -left-[12%] bottom-[-2%]"><Coins size={20} weight="fill" /></IconBubble>
           </div>
         </div>
       </div>
@@ -135,8 +147,12 @@ function SalesCard({ className, compact }: { className?: string; compact?: boole
       </p>
       {!compact && (
         <div className="mt-2.5 flex h-9 items-end gap-1">
-          {bars.map((h, i) => (
-            <span key={i} className={cn('flex-1 rounded-t-[3px]', i === bars.length - 1 ? 'bg-brand' : 'bg-surface-3')} style={{ height: `${h}%` }} />
+          {bars.map((h, n) => (
+            <span
+              key={n}
+              className={cn('bar-grow flex-1 rounded-t-[3px]', n === bars.length - 1 ? 'bg-brand' : 'bg-surface-3')}
+              style={{ height: `${h}%`, '--i': n } as CSSProperties}
+            />
           ))}
         </div>
       )}
@@ -187,10 +203,71 @@ function ReportCard({ className }: { className?: string }) {
   );
 }
 
-function IconBubble({ children, className }: { children: ReactNode; className?: string }) {
+function IconBubble({ children, className, depth, index }: { children: ReactNode; className?: string; depth: number; index: number }) {
   return (
-    <span className={cn('grid size-11 place-items-center rounded-full bg-white/10 text-lime ring-1 ring-inset ring-white/15 backdrop-blur-sm', className)}>
+    <span
+      data-depth={depth}
+      style={i(index)}
+      className={cn('brand-in grid size-11 place-items-center rounded-full bg-white/10 text-lime ring-1 ring-inset ring-white/15 backdrop-blur-sm', className)}
+    >
       {children}
     </span>
   );
+}
+
+/** Urutan muncul untuk kelas .brand-in (jedanya dihitung di CSS) */
+function i(n: number): CSSProperties {
+  return { '--i': n } as CSSProperties;
+}
+
+/**
+ * Efek kedalaman: elemen [data-depth] bergeser sedikit mengikuti kursor di atas panel.
+ * Hanya untuk mouse (bukan layar sentuh) dan mati saat "kurangi gerak". Transform ditulis
+ * langsung ke tiap elemen (bukan variabel CSS di induk) dengan interpolasi ringan per frame,
+ * jadi gerakannya halus, bisa berbalik kapan saja, dan berhenti sendiri saat diam.
+ */
+function useDepthParallax(ref: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const panel = ref.current;
+    if (!panel) return;
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!fine || reduce) return;
+    const layers = [...panel.querySelectorAll<HTMLElement>('[data-depth]')].map((el) => ({ el, depth: Number(el.dataset.depth) }));
+    const target = { x: 0, y: 0 };
+    const current = { x: 0, y: 0 };
+    let frame = 0;
+    const tick = () => {
+      current.x += (target.x - current.x) * 0.1;
+      current.y += (target.y - current.y) * 0.1;
+      for (const { el, depth } of layers) {
+        el.style.transform = `translate3d(${(current.x * depth).toFixed(2)}px, ${(current.y * depth).toFixed(2)}px, 0)`;
+      }
+      const settled = Math.abs(target.x - current.x) < 0.001 && Math.abs(target.y - current.y) < 0.001;
+      frame = settled ? 0 : requestAnimationFrame(tick);
+    };
+    const start = () => {
+      if (!frame) frame = requestAnimationFrame(tick);
+    };
+    const onMove = (e: PointerEvent) => {
+      const r = panel.getBoundingClientRect();
+      // -1..1 dari tengah panel; geser maksimal = nilai data-depth (px)
+      target.x = ((e.clientX - r.left) / r.width - 0.5) * 2;
+      target.y = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      start();
+    };
+    const onLeave = () => {
+      target.x = 0;
+      target.y = 0;
+      start();
+    };
+    panel.addEventListener('pointermove', onMove);
+    panel.addEventListener('pointerleave', onLeave);
+    return () => {
+      panel.removeEventListener('pointermove', onMove);
+      panel.removeEventListener('pointerleave', onLeave);
+      cancelAnimationFrame(frame);
+      for (const { el } of layers) el.style.transform = '';
+    };
+  }, [ref]);
 }

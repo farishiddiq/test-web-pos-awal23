@@ -476,3 +476,38 @@
     radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1.2px);
   background-size: auto, 22px 22px;
 }
+
+/* Halaman masuk: susunan POS muncul sekali saat dibuka. Memakai properti translate/scale
+   (bukan transform) supaya tidak bentrok dengan rotasi kartu dan efek kedalaman kursor.
+   fill-mode backwards: setelah selesai, transform kedalaman (inline) berlaku normal. */
+@media (prefers-reduced-motion: no-preference) {
+  .brand-in {
+    animation: brand-in 560ms var(--ease-out) calc(180ms + var(--i, 0) * 80ms) backwards;
+  }
+  .bar-grow {
+    transform-origin: bottom;
+    animation: bar-grow 520ms var(--ease-out) calc(640ms + var(--i, 0) * 45ms) backwards;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-in {
+    animation: brand-fade 200ms ease backwards;
+  }
+}
+@keyframes brand-in {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+    scale: 0.96;
+  }
+}
+@keyframes brand-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes bar-grow {
+  from {
+    scale: 1 0.25;
+  }
+}
