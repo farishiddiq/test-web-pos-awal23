@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router';
 import { ArrowDown, ArrowRight, EnvelopeSimple, Eye, EyeSlash, PlayCircle } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { useSession } from '@/data/session';
-import { Logo } from '@/components/layout/logo';
 import { Button } from '@/components/ui/button';
 import { Field, TextInput } from '@/components/ui/form';
 import { normalizeUsername, toAuthEmail, usernameError } from '@/lib/username';
 import { cn } from '@/lib/util';
-import { AuthShowcase } from './auth-showcase';
+import { AuthBrand } from './auth-brand';
 import { BrandFooter, BusinessMarquee, EgyptDetails, FactsBand, FeatureTour, FinalCta, GrowthFeatures, Showcase, Testimonials } from './landing-sections';
 
 type Mode = 'login' | 'register' | 'forgot';
@@ -34,26 +33,20 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
       {/* Layar masuk: form di kiri, panel merek dengan screenshot asli di kanan */}
       {/* Di laptop: tepat satu layar (100dvh), isi menyesuaikan tinggi layar */}
       <section className="relative p-2.5 md:p-4 lg:h-[100dvh] lg:min-h-[600px] lg:p-5">
-        <div className="mx-auto grid min-h-[calc(100dvh-20px)] max-w-[1320px] grid-cols-1 gap-2.5 rounded-[32px] bg-surface p-2.5 shadow-[var(--shadow-float)] md:min-h-[calc(100dvh-32px)] md:p-3 lg:h-full lg:min-h-0 lg:grid-cols-2">
-          <div className="flex min-w-0 flex-col px-4 pb-4 pt-4 md:px-8 md:pt-6 lg:min-h-0 lg:overflow-y-auto lg:px-12 lg:pt-5">
-            <div className="flex items-center justify-between gap-3">
-              <Logo />
-              <a href="#lihat-fitur" className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[14px] font-semibold text-ink-2 hover:text-ink lg:hidden">
-                Lihat fitur <ArrowDown size={15} weight="bold" aria-hidden />
-              </a>
-            </div>
+        <div className="mx-auto grid min-h-[calc(100dvh-20px)] max-w-[1400px] grid-cols-1 gap-2.5 rounded-[32px] bg-surface p-2.5 shadow-[var(--shadow-float)] md:min-h-[calc(100dvh-32px)] md:p-3 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+          {/* identitas POSSIR lebih dulu: di HP tampil paling atas */}
+          <AuthBrand />
 
-            <div ref={formRef} id="akun" className="mx-auto flex w-full max-w-[420px] flex-1 scroll-mt-24 flex-col justify-center py-8 lg:py-5 lg:[@media(max-height:820px)]:py-2">
+          <div className="flex min-w-0 flex-col px-4 pb-4 pt-2 md:px-8 lg:min-h-0 lg:overflow-y-auto lg:px-10 lg:pt-5">
+            <div ref={formRef} id="akun" className="mx-auto flex w-full max-w-[400px] flex-1 scroll-mt-24 flex-col justify-center py-8 lg:py-5 lg:[@media(max-height:820px)]:py-2">
               <AuthForm mode={mode} onModeChange={setMode} />
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 text-[13.5px] text-ink-3 lg:[@media(max-height:820px)]:hidden">
-              <a href="#testimoni" className="hover:text-ink">Testimoni</a>
+              <a href="#lihat-fitur" className="hover:text-ink">Lihat fitur</a>
               <span>© 2026 Possir</span>
             </div>
           </div>
-
-          <AuthShowcase className="min-h-[560px] lg:h-full lg:min-h-0" />
         </div>
 
         {/* Penanda bahwa halaman bisa digulir: pil di tengah bawah, menempel di tepi kartu */}
