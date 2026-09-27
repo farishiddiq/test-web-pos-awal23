@@ -7,7 +7,8 @@ import { Logo } from '@/components/layout/logo';
 import { Button } from '@/components/ui/button';
 import { Field, TextInput } from '@/components/ui/form';
 import { Segmented } from '@/components/ui/choice';
-import { BrandFooter, BusinessMarquee, EgyptDetails, FactsBand, FeatureTour, FinalCta, Showcase, Testimonials } from './landing-sections';
+import { normalizeUsername, toAuthEmail, usernameError } from '@/lib/username';
+import { BrandFooter, BusinessMarquee, EgyptDetails, FactsBand, FeatureTour, FinalCta, GrowthFeatures, Showcase, Testimonials } from './landing-sections';
 
 type Mode = 'login' | 'register' | 'forgot';
 
@@ -79,6 +80,7 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
       <FeatureTour />
       <FactsBand />
       <EgyptDetails />
+      <GrowthFeatures />
       <Testimonials />
       <FinalCta>
         <Button size="lg" onClick={() => openAuth('register')} iconRight={<ArrowRight size={18} weight="bold" />}>Daftar gratis</Button>
@@ -93,35 +95,46 @@ function AuthCard({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
   const { supabaseReady, startDemo, signIn, signUp, requestPasswordReset } = useSession();
   const navigate = useNavigate();
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [demoBusy, setDemoBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState<null | 'confirm' | 'reset'>(null);
+  const [sent, setSent] = useState(false);
 
   const switchMode = (next: Mode) => {
     onModeChange(next);
     setError(null);
-    setSent(null);
+    setSent(false);
     navigate(next === 'login' ? '/masuk' : next === 'register' ? '/daftar' : '/lupa-sandi', { replace: true });
   };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!email.includes('@')) return setError('Masukkan email yang valid.');
+    const id = normalizeUsername(login);
+    if (mode === 'forgot') {
+      if (!id.includes('@')) return setError('Akun username tidak punya email. Minta admin Possir mengatur ulang kata sandimu.');
+    } else if (!id) {
+      return setError('Isi username dulu.');
+    } else if (mode === 'register' || !id.includes('@')) {
+      // akun lama boleh masuk pakai email; akun baru wajib username
+      const invalid = usernameError(id);
+      if (invalid) return setError(invalid);
+    }
     if (mode !== 'forgot' && password.length < 6) return setError('Kata sandi minimal 6 karakter.');
     if (mode === 'register' && !name.trim()) return setError('Isi nama kamu dulu.');
     setBusy(true);
     try {
-      if (mode === 'login') await signIn(email.trim(), password);
+      if (mode === 'login') await signIn(toAuthEmail(id), password);
       else if (mode === 'register') {
-        const { needsConfirmation } = await signUp(email.trim(), password, name.trim());
-        if (needsConfirmation) setSent('confirm');
+        const { needsConfirmation } = await signUp(toAuthEmail(id), password, name.trim());
+        if (needsConfirmation) {
+          setError('Akun dibuat, tapi Supabase masih meminta konfirmasi email. Admin perlu mematikan "Confirm email" di Supabase, lalu kamu bisa masuk.');
+        }
       } else {
-        await requestPasswordReset(email.trim());
-        setSent('reset');
+        await requestPasswordReset(id);
+        setSent(true);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan.');
@@ -166,9 +179,7 @@ function AuthCard({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
           </div>
           <h2 className="mt-4 text-[20px] font-bold">Cek email kamu</h2>
           <p className="mx-auto mt-2 max-w-[34ch] text-[14px] text-ink-2">
-            {sent === 'confirm'
-              ? `Kami mengirim tautan konfirmasi ke ${email}. Klik tautannya, lalu masuk.`
-              : `Kalau ${email} terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim.`}
+            {`Kalau ${login.trim()} terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim.`}
           </p>
           <Button variant="secondary" className="mt-6" onClick={() => switchMode('login')}>
             Kembali ke halaman masuk
@@ -179,7 +190,7 @@ function AuthCard({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
           {mode === 'forgot' ? (
             <div>
               <h2 className="text-[22px] font-bold tracking-[-0.02em]">Lupa kata sandi</h2>
-              <p className="mt-1.5 text-[14px] text-ink-3">Kami kirim tautan untuk membuat kata sandi baru.</p>
+              <p className="mt-1.5 text-[14px] text-ink-3">Khusus akun lama yang daftar pakai email. Akun username: minta admin Possir mengatur ulang kata sandimu.</p>
             </div>
           ) : (
             <Segmented
@@ -200,17 +211,24 @@ function AuthCard({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
                 <TextInput id="auth-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Misal: Ahmad Fauzi" />
               </Field>
             )}
-            <Field label="Email" htmlFor="auth-email">
-              <TextInput
-                id="auth-email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="nama@email.com"
-              />
-            </Field>
+            {mode === 'forgot' ? (
+              <Field label="Email akun" htmlFor="auth-login">
+                <TextInput id="auth-login" type="email" inputMode="email" autoComplete="email" value={login} onChange={(e) => setLogin(e.target.value)} placeholder="nama@email.com" />
+              </Field>
+            ) : (
+              <Field label="Username" htmlFor="auth-login" hint={mode === 'register' ? 'Huruf kecil, angka, titik, atau garis bawah. Minimal 3 karakter.' : undefined}>
+                <TextInput
+                  id="auth-login"
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  value={login}
+                  onChange={(e) => setLogin(mode === 'register' ? e.target.value.toLowerCase().replace(/\s/g, '') : e.target.value)}
+                  placeholder="misal: ahmad.fauzi"
+                />
+              </Field>
+            )}
             {mode !== 'forgot' && (
               <Field
                 label="Kata sandi"
@@ -255,9 +273,15 @@ function AuthCard({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
                 atau
                 <span className="h-px flex-1 bg-line" />
               </div>
-              <Button variant="secondary" size="lg" block onClick={openDemo} loading={demoBusy} loadingText="Menyiapkan demo…">
-                Lihat demo tanpa daftar
-              </Button>
+              <button
+                type="button"
+                onClick={openDemo}
+                disabled={demoBusy}
+                className="pressable inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-lime px-6 text-[16px] font-bold text-on-lime ring-1 ring-inset ring-[color-mix(in_oklab,var(--on-lime)_14%,transparent)] hover:brightness-105 disabled:opacity-70"
+              >
+                {demoBusy ? 'Menyiapkan demo…' : 'Lihat demo tanpa daftar'}
+                {!demoBusy && <ArrowRight size={18} weight="bold" aria-hidden />}
+              </button>
             </>
           )}
         </form>

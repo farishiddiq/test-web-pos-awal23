@@ -186,12 +186,12 @@ export function useSession(): SessionValue {
 
 function translateAuthError(message: string): Error {
   const map: Array<[RegExp, string]> = [
-    [/Invalid login credentials/i, 'Email atau kata sandi salah.'],
+    [/Invalid login credentials/i, 'Username atau kata sandi salah.'],
     [/Email not confirmed/i, 'Email belum dikonfirmasi. Cek kotak masuk (atau folder spam) lalu klik tautannya.'],
-    [/User already registered/i, 'Email ini sudah terdaftar. Silakan masuk.'],
+    [/User already registered/i, 'Username ini sudah dipakai. Pilih username lain, atau masuk kalau ini akunmu.'],
     [/Password should be at least/i, 'Kata sandi minimal 6 karakter.'],
     [/rate limit|too many/i, 'Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.'],
-    [/Unable to validate email|invalid email/i, 'Format email tidak valid.'],
+    [/Unable to validate email|invalid email/i, 'Username tidak valid.'],
     [/same password/i, 'Kata sandi baru harus berbeda dari yang lama.'],
   ];
   for (const [pattern, text] of map) if (pattern.test(message)) return new Error(text);

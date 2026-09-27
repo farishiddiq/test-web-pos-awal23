@@ -27,8 +27,8 @@ end;
 $$;
 
 insert into auth.users (id, email, raw_user_meta_data) values
-  ('00000000-0000-4000-8000-000000000d01', 'ahmad@demo.possir', '{"full_name":"Ahmad Fauzi"}'),
-  ('00000000-0000-4000-8000-000000000d02', 'rizki@demo.possir', '{"full_name":"Rizki Maulana"}')
+  ('00000000-0000-4000-8000-000000000d01', 'ahmad@user.possir.app', '{"full_name":"Ahmad Fauzi"}'),
+  ('00000000-0000-4000-8000-000000000d02', 'rizki@user.possir.app', '{"full_name":"Rizki Maulana"}')
 on conflict (id) do nothing;
 
 -- Katalog seed: isi per karton grosir, bobot kelarisan, target stok akhir, pemasok,
@@ -380,6 +380,20 @@ begin
     and action in ('product.create', 'customer.create', 'expense.create', 'supplier.create');
   update public.audit_logs set created_at = private.day_start(v_today - 35, c_tz) + interval '8 hours'
   where business_id = v_b and action in ('business.create');
+  update public.audit_logs a set created_at = p.created_at
+  from public.purchases p where a.business_id = v_b and a.entity = 'purchase' and a.entity_id = p.id;
+  update public.audit_logs a set created_at = s.voided_at
+  from public.sales s where a.business_id = v_b and a.action = 'sale.void' and a.entity_id = s.id;
+  update public.audit_logs a set created_at = sp.created_at
+  from public.supplier_payments sp where a.business_id = v_b and a.action = 'supplier.payment' and a.entity_id = sp.supplier_id;
+  -- stock opname yang dibuat seed juga masuk riwayat aktivitas
+  insert into public.audit_logs (business_id, actor_id, actor_name, action, entity, entity_id, details, created_at)
+  select v_b, c_owner, 'Ahmad', 'stock.adjust', 'product', m.product_id,
+         jsonb_build_object('name', p.name, 'before', m.qty_after - m.qty_change, 'change', m.qty_change,
+                            'after', m.qty_after, 'reason', m.reason),
+         m.created_at
+  from public.stock_movements m join public.products p on p.id = m.product_id
+  where m.business_id = v_b and m.type = 'adjustment';
 end;
 $$;
 

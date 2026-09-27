@@ -9,14 +9,25 @@ import {
   Money as MoneyIcon,
   Package,
   Quotes,
-  Cookie,
-  CookingPot,
-  Coffee,
-  Snowflake,
-  ShoppingBag,
-  BowlFood,
-  Cake,
+  SuitcaseRolling,
+  Scissors,
+  HandHeart,
+  Broom,
+  Wrench,
+  WashingMachine,
+  Camera,
+  Moped,
+  ForkKnife,
+  AirplaneTilt,
+  Ticket,
+  MapTrifold,
   Storefront,
+  Truck,
+  Sliders,
+  Trophy,
+  ChartLineUp,
+  UsersThree,
+  ClockCounterClockwise,
 } from '@phosphor-icons/react';
 import { Avatar } from '@/components/ui/display';
 import { Logo } from '@/components/layout/logo';
@@ -285,6 +296,126 @@ export function EgyptDetails() {
   );
 }
 
+/** Potongan screenshot asli (kartu atau panel), dipotong dari atas bila terlalu tinggi */
+function ClipShot({ src, alt, width, height, maxH, className }: { src: string; alt: string; width: number; height: number; maxH?: string; className?: string }) {
+  return (
+    <div className={cn('overflow-hidden rounded-[18px] border border-line bg-surface shadow-[var(--shadow-card)]', className)} style={maxH ? { maxHeight: maxH } : undefined}>
+      <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" className="block h-auto w-full" />
+    </div>
+  );
+}
+
+function GrowthCell({
+  icon: I,
+  title,
+  body,
+  children,
+  className,
+  style,
+  dark,
+}: {
+  icon: typeof Truck;
+  title: string;
+  body: string;
+  children?: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+  dark?: boolean;
+}) {
+  return (
+    <article
+      className={cn('flex min-w-0 flex-col overflow-hidden rounded-[var(--radius-card)] p-6 md:p-7', dark ? 'bg-[var(--deep)] text-[var(--on-deep)]' : 'card', className)}
+      style={style}
+    >
+      <span className={cn('grid size-11 place-items-center rounded-full', dark ? 'bg-lime text-on-lime' : 'bg-brand-soft text-brand-ink')}>
+        <I size={22} weight="bold" aria-hidden />
+      </span>
+      <h3 className="mt-4 text-[19px] font-bold tracking-[-0.01em]">{title}</h3>
+      <p className={cn('mt-1.5 max-w-[46ch] text-[14.5px] leading-relaxed', dark ? 'text-[var(--on-deep-2)]' : 'text-ink-2')}>{body}</p>
+      {children && <div className="mt-6 min-w-0 flex-1">{children}</div>}
+    </article>
+  );
+}
+
+/** Fitur untuk usaha yang mulai besar, semuanya dengan screenshot asli */
+export function GrowthFeatures() {
+  return (
+    <section id="fitur-lengkap" className="mx-auto max-w-[1200px] scroll-mt-24 px-5 pt-24 md:px-8 md:pt-32">
+      <h2 className="max-w-[20ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">Siap saat usahamu mulai besar.</h2>
+      <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-12">
+        <GrowthCell
+          icon={Truck}
+          title="Supplier dan pembelian"
+          body="Catat belanja stok per supplier. Stok bertambah otomatis, harga modal ikut terbaru, dan hutang ke supplier bisa dicicil."
+          className="md:col-span-7"
+        >
+          <DesktopShot src="/screens/supplier-desktop.webp" alt="Halaman supplier Possir: hutang ke supplier dan pembelian terakhir" />
+        </GrowthCell>
+        <GrowthCell
+          icon={Sliders}
+          title="Stock adjustment"
+          body="Barang rusak, hilang, kedaluwarsa, atau hasil hitung ulang. Setiap perubahan tercatat dengan alasannya."
+          className="md:col-span-5"
+          style={{ background: 'var(--tint-sky-bg)' }}
+        >
+          <ClipShot src="/screens/stok-opname.webp" alt="Riwayat stok dan form stock opname di Possir" width={920} height={1752} maxH="340px" className="mx-auto max-w-[300px]" />
+        </GrowthCell>
+        <GrowthCell
+          icon={Trophy}
+          title="Produk terlaris dan jam laku"
+          body="Lihat barang yang paling laku beserta labanya, dan jam berapa pembeli paling ramai."
+          className="md:col-span-5"
+        >
+          <ClipShot src="/screens/terlaris.webp" alt="Tabel produk terlaris dengan jumlah terjual, omzet, dan laba" width={1362} height={922} />
+        </GrowthCell>
+        <GrowthCell
+          icon={ChartLineUp}
+          title="Laba bersih"
+          body="Bukan cuma omzet. Possir mengurangi modal barang dan semua pengeluaran, jadi kamu tahu untung yang sebenarnya."
+          className="md:col-span-7"
+          dark
+        >
+          <dl className="grid gap-2.5 rounded-[18px] bg-white/[0.06] p-5 text-[15px]">
+            {(
+              [
+                ['Omzet penjualan', 'Semua transaksi yang tidak dibatalkan'],
+                ['Dikurangi modal barang', 'Harga modal barang yang terjual'],
+                ['Dikurangi pengeluaran', 'Transport, kemasan, sewa, listrik, iklan'],
+              ] as const
+            ).map(([k, v]) => (
+              <div key={k} className="flex flex-wrap items-baseline justify-between gap-x-4 border-b border-white/10 pb-2.5">
+                <dt className="font-semibold">{k}</dt>
+                <dd className="text-[13.5px] text-[var(--on-deep-2)]">{v}</dd>
+              </div>
+            ))}
+            <div className="flex items-baseline justify-between gap-4 pt-1">
+              <dt className="text-[17px] font-bold text-lime">Laba bersih</dt>
+              <dd className="text-[13.5px] text-[var(--on-deep-2)]">Harian dan bulanan, bisa dikirim ke WhatsApp</dd>
+            </div>
+          </dl>
+        </GrowthCell>
+        <GrowthCell
+          icon={UsersThree}
+          title="Multi-user"
+          body="Undang kasir dengan kode. Kasir bisa jualan dan terima bayaran hutang, tapi tidak melihat modal, laba, dan laporan."
+          className="md:col-span-6"
+          style={{ background: 'var(--tint-lime-bg)' }}
+        >
+          <ClipShot src="/screens/anggota.webp" alt="Daftar anggota: pemilik dan kasir" width={2312} height={618} />
+        </GrowthCell>
+        <GrowthCell
+          icon={ClockCounterClockwise}
+          title="Audit log"
+          body="Siapa membatalkan transaksi, mengubah harga, atau stok, lengkap dengan waktunya. Tidak ada yang bisa dihapus diam-diam."
+          className="md:col-span-6"
+        >
+          <ClipShot src="/screens/audit.webp" alt="Riwayat aktivitas: pembelian, pembayaran supplier, dan perubahan stok" width={2312} height={1004} />
+        </GrowthCell>
+      </div>
+    </section>
+  );
+}
+
 export function Testimonials() {
   const [first, ...rest] = TESTIMONIALS;
   return (
@@ -347,14 +478,19 @@ export function FinalCta({ children }: { children: ReactNode }) {
 }
 
 const BUSINESS_TYPES = [
-  [CookingPot, 'Katering rumahan'],
-  [Snowflake, 'Frozen food'],
-  [ShoppingBag, 'Jastip'],
-  [BowlFood, 'Warung bakso dan soto'],
-  [Cake, 'Kue dan roti'],
-  [Coffee, 'Minuman dan kopi'],
-  [Cookie, 'Camilan kemasan'],
-  [Storefront, 'Toko kelontong'],
+  [SuitcaseRolling, 'Bagasi dan jastip'],
+  [Storefront, 'Toko barang Asia'],
+  [Scissors, 'Jasa cukur'],
+  [HandHeart, 'Pijat'],
+  [Broom, 'Bersih-bersih'],
+  [Wrench, 'Ledeng'],
+  [WashingMachine, 'Laundry'],
+  [Camera, 'Fotografi'],
+  [Moped, 'Tausil rumahan'],
+  [ForkKnife, "Mat'am"],
+  [AirplaneTilt, 'Travel'],
+  [Ticket, 'Ticketing'],
+  [MapTrifold, 'Tour guide'],
 ] as const;
 
 /** Jenis usaha yang cocok. Satu-satunya marquee di halaman. */
@@ -441,7 +577,7 @@ export function BrandFooter({ onAuth }: { onAuth: (mode: 'login' | 'register') =
         <p aria-hidden className="mx-auto mt-14 max-w-[1200px] select-none pb-[0.08em] text-[clamp(96px,22vw,300px)] font-extrabold leading-[0.95] tracking-[-0.06em] text-lime/90">
           possir
         </p>
-        <p className="mx-auto mt-10 max-w-[1200px] border-t border-white/10 pt-6 text-[13px] text-[var(--on-deep-2)] md:mt-14">© 2026 Possir. Untuk warung rumahan, katering, frozen food, jastip, dan usaha Masisir lainnya.</p>
+        <p className="mx-auto mt-10 max-w-[1200px] border-t border-white/10 pt-6 text-[13px] text-[var(--on-deep-2)] md:mt-14">© 2026 Possir. Untuk toko, jastip, jasa, travel, dan usaha Masisir lainnya.</p>
       </div>
     </footer>
   );

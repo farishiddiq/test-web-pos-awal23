@@ -9,6 +9,7 @@ import { Field, SwitchRow, TextArea, TextInput, inputClass } from '@/components/
 import { Avatar, Badge, PageHeader, Skeleton } from '@/components/ui/display';
 import { useBusiness } from '@/data/business';
 import { useSession } from '@/data/session';
+import { loginLabel } from '@/lib/username';
 import {
   useAddPaymentMethod,
   useAuditLogs,
@@ -78,7 +79,7 @@ function AccountSection() {
   const [name, setName] = useState(context.me.display_name);
 
   return (
-    <Section title="Akun" description={user?.email ?? undefined}>
+    <Section title="Akun" description={loginLabel(user?.email) ?? undefined}>
       <form
         className="flex flex-wrap items-end gap-3"
         onSubmit={async (e) => {
@@ -384,7 +385,7 @@ function MembersSection() {
                   <p className="truncate text-[14.5px] font-semibold">
                     {m.display_name ?? 'Tanpa nama'} {m.is_me && <span className="font-medium text-ink-3">(kamu)</span>}
                   </p>
-                  <p className="truncate text-[12.5px] text-ink-3">{m.email}</p>
+                  <p className="truncate text-[12.5px] text-ink-3">{loginLabel(m.email)}</p>
                 </div>
                 <Badge tone={m.role === 'owner' ? 'lime' : 'neutral'}>{m.role === 'owner' ? 'Pemilik' : 'Kasir'}</Badge>
                 {!m.is_me &&

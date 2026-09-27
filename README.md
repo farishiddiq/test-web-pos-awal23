@@ -32,8 +32,15 @@ database sekitar 10 MB; berikutnya langsung terbuka.
    - Site URL: alamat aplikasi (saat lokal `http://localhost:5173`)
    - Redirect URLs: tambahkan `http://localhost:5173/**` dan domain produksi `https://domainmu/**`
      (dipakai tautan konfirmasi email dan atur ulang kata sandi `/atur-sandi`)
-   - Opsional: matikan *Confirm email* di **Authentication > Providers > Email** kalau ingin
-     pengguna langsung masuk setelah daftar.
+   - **Wajib:** matikan *Confirm email* di **Authentication > Sign In / Providers > Email**.
+     Pengguna daftar dan masuk pakai **username**. Di balik layar username disimpan sebagai
+     `username@user.possir.app` (alamat internal, tidak pernah dikirimi email). Akun lama yang
+     dulu daftar pakai email tetap bisa masuk dengan emailnya.
+   - Atur ulang kata sandi akun username (tidak punya email), jalankan di SQL Editor:
+     ```sql
+     update auth.users set encrypted_password = crypt('kata-sandi-baru', gen_salt('bf'))
+     where email = 'username@user.possir.app';
+     ```
 4. Salin `.env.example` menjadi `.env`, isi dari **Project Settings > API**:
    ```
    VITE_SUPABASE_URL=https://xxxx.supabase.co

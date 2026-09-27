@@ -108,6 +108,25 @@ async function shot(name) {
   console.log(`  ${name}.webp`);
 }
 
+// Potong screenshot ke satu elemen (kartu atau panel), dengan sedikit ruang di sekelilingnya
+async function shotOf(name, selectorExpr, pad = 16) {
+  const rect = await evaluate(`(() => {
+    const el = ${selectorExpr};
+    if (!el) return null;
+    el.scrollIntoView({ block: 'center' });
+    const r = el.getBoundingClientRect();
+    return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height };
+  })()`);
+  if (!rect) throw new Error(`Elemen untuk ${name} tidak ditemukan`);
+  await sleep(400);
+  const clip = { x: Math.max(0, rect.x - pad), y: Math.max(0, rect.y - pad), width: rect.width + pad * 2, height: rect.height + pad * 2, scale: 1 };
+  const { data } = await send('Page.captureScreenshot', { format: 'webp', quality: 85, clip, captureBeyondViewport: true });
+  writeFileSync(join(outDir, `${name}.webp`), Buffer.from(data, 'base64'));
+  console.log(`  ${name}.webp`);
+}
+const byHeading = (text, closest = 'section') =>
+  `[...document.querySelectorAll('h2, h3, span')].find((h) => h.textContent.trim() === ${JSON.stringify(text)})?.closest('${closest}')`;
+
 try {
   mkdirSync(outDir, { recursive: true });
   await send('Page.enable');
@@ -139,6 +158,31 @@ try {
   }
   await sleep(500);
   await shot('kasir-desktop');
+
+  // fitur usaha yang tumbuh
+  await go('/supplier', `document.body.innerText.includes('Grosir Indo')`);
+  await shot('supplier-desktop');
+  await go('/laporan', `document.body.innerText.includes('Produk terlaris')`);
+  await clickText('Bulanan');
+  await waitFor(`document.querySelectorAll('table tr').length > 20`, 'laporan bulanan');
+  await sleep(600);
+  await shotOf('terlaris', byHeading('Produk terlaris'));
+  await go('/produk', `document.body.innerText.includes('Kerupuk Udang Finna')`);
+  await evaluate(`[...document.querySelectorAll('main button, main a')].find((b) => b.textContent.includes('Kerupuk Udang Finna'))?.click(); true`);
+  await waitFor(`document.querySelector('[role=dialog]')`, 'lembar produk');
+  await clickText('Stok:');
+  await waitFor(`document.querySelector('[role=dialog]')?.innerText.includes('Riwayat stok') && !document.querySelector('[role=dialog] .skeleton')`, 'riwayat stok');
+  await sleep(900);
+  await shotOf('stok-opname', `document.querySelector('[role=dialog]')`, 0);
+  await evaluate(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); true`);
+  await sleep(600);
+  await go('/pengaturan', `document.body.innerText.includes('Anggota dan kasir')`);
+  await waitFor(`document.body.innerText.includes('Rizki')`, 'daftar anggota');
+  await shotOf('anggota', byHeading('Anggota dan kasir'));
+  await clickText('Riwayat aktivitas');
+  await waitFor(`${byHeading('Riwayat aktivitas')}?.querySelectorAll('li').length > 3`, 'riwayat aktivitas');
+  await evaluate(`(() => { const s = ${byHeading('Riwayat aktivitas')}; s.querySelectorAll('li').forEach((li, i) => { if (i > 5) li.remove(); }); return true; })()`);
+  await shotOf('audit', byHeading('Riwayat aktivitas'));
 
   console.log('HP');
   await viewport(390, 844, true);
