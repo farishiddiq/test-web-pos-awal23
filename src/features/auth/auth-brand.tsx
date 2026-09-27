@@ -94,10 +94,10 @@ export function AuthBrand({ className }: { className?: string }) {
               <ReportCard className="w-[225px] -rotate-1" />
             </div>
 
-            <IconBubble depth={24} index={5} className="absolute -left-[16%] top-[-1%]"><CashRegister size={20} weight="fill" /></IconBubble>
-            <IconBubble depth={20} index={5} className="absolute -right-[16%] top-[-3%]"><Money size={20} weight="fill" /></IconBubble>
-            <IconBubble depth={22} index={6} className="absolute -right-[12%] bottom-[-1%]"><Storefront size={20} weight="fill" /></IconBubble>
-            <IconBubble depth={26} index={6} className="absolute -left-[12%] bottom-[-2%]"><Coins size={20} weight="fill" /></IconBubble>
+            <IconBubble depth={24} index={5} className="absolute right-[calc(100%+16px)] top-[-1%]"><CashRegister size={20} weight="fill" /></IconBubble>
+            <IconBubble depth={20} index={5} className="absolute left-[calc(100%+16px)] top-[-3%]"><Money size={20} weight="fill" /></IconBubble>
+            <IconBubble depth={22} index={6} className="absolute left-[calc(100%+12px)] bottom-[-1%]"><Storefront size={20} weight="fill" /></IconBubble>
+            <IconBubble depth={26} index={6} className="absolute right-[calc(100%+12px)] bottom-[-2%]"><Coins size={20} weight="fill" /></IconBubble>
           </div>
         </div>
       </div>
