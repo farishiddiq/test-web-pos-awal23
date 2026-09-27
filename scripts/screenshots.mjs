@@ -167,6 +167,15 @@ try {
   await waitFor(`document.querySelectorAll('table tr').length > 20`, 'laporan bulanan');
   await sleep(600);
   await shotOf('terlaris', byHeading('Produk terlaris'));
+  // jam ramai: laporan harian, mundur ke hari yang cukup ramai supaya grafiknya terisi
+  await clickText('Harian');
+  for (let i = 0; i < 7; i++) {
+    await evaluate(`document.querySelector('[aria-label="Hari sebelumnya"]').click(); true`);
+    await sleep(900);
+    const rows = await evaluate(`${byHeading('Jam ramai')}?.querySelectorAll('table tr').length ?? 0`);
+    if (rows >= 11) break;
+  }
+  await shotOf('jam-ramai', byHeading('Jam ramai'));
   await go('/produk', `document.body.innerText.includes('Kerupuk Udang Finna')`);
   await evaluate(`[...document.querySelectorAll('main button, main a')].find((b) => b.textContent.includes('Kerupuk Udang Finna'))?.click(); true`);
   await waitFor(`document.querySelector('[role=dialog]')`, 'lembar produk');

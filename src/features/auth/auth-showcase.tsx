@@ -6,12 +6,6 @@ import { ClipShot, PhoneShot } from './landing-sections';
 // dengan satu kartu potongan layar lain yang "melayang" seperti di contoh desain.
 const SLIDES = [
   {
-    title: 'Tahu untung setiap hari',
-    body: 'Penjualan, laba kotor, uang masuk, dan pengeluaran hari ini langsung terlihat dari HP.',
-    phone: { src: '/screens/dashboard-mobile.webp', alt: 'Dashboard Possir di HP' },
-    card: { src: '/screens/terlaris.webp', alt: 'Tabel produk terlaris dengan laba', width: 1362, height: 922, className: 'w-[250px]' },
-  },
-  {
     title: 'Kasir cepat, stok jalan sendiri',
     body: 'Ketuk produk, pilih cara bayar Mesir, selesai. Setiap penjualan langsung mengurangi stok.',
     phone: { src: '/screens/kasir-mobile.webp', alt: 'Kasir Possir di HP' },
@@ -22,6 +16,12 @@ const SLIDES = [
     body: 'Bayar sebagian, janji bayar, dan pengingat WhatsApp. Kasir diundang dengan kode, semua tercatat.',
     phone: { src: '/screens/piutang-mobile.webp', alt: 'Halaman piutang Possir di HP' },
     card: { src: '/screens/anggota.webp', alt: 'Daftar anggota: pemilik dan kasir', width: 2312, height: 618, className: 'w-[270px]' },
+  },
+  {
+    title: 'Tahu untung setiap hari',
+    body: 'Penjualan, laba kotor, uang masuk, dan pengeluaran hari ini langsung terlihat dari HP.',
+    phone: { src: '/screens/dashboard-mobile.webp', alt: 'Dashboard Possir di HP' },
+    card: { src: '/screens/jam-ramai.webp', alt: 'Grafik jam ramai penjualan', width: 1362, height: 614, className: 'w-[270px]' },
   },
 ] as const;
 

@@ -365,7 +365,11 @@ export function GrowthFeatures() {
           body="Lihat barang yang paling laku beserta labanya, dan jam berapa pembeli paling ramai."
           className="md:col-span-12"
         >
-          <ClipShot src="/screens/terlaris.webp" alt="Tabel produk terlaris dengan jumlah terjual, omzet, dan laba" width={1362} height={922} className="max-w-[760px]" />
+          <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+            {/* dipotong ke 5 produk teratas supaya tidak terlalu tinggi */}
+            <ClipShot src="/screens/terlaris.webp" alt="Tabel 5 produk terlaris dengan jumlah terjual, omzet, dan laba" width={1362} height={922} maxH="250px" />
+            <ClipShot src="/screens/jam-ramai.webp" alt="Grafik jam ramai: penjualan per jam dengan jam tertinggi" width={1362} height={614} />
+          </div>
         </GrowthCell>
         <GrowthCell
           icon={UsersThree}
