@@ -54,8 +54,9 @@ export function OrderPanel({ onClose, onQuickSale }: { onClose?: () => void; onQ
   const { businessId, context, activeMethods, today } = useBusiness();
   const cart = useCart(businessId);
   const createSale = useCreateSale();
-  const { lines, customer, discount, note } = cart.state;
-  const { subtotal, total, count } = cart.totals;
+  const { lines, customer, note } = cart.state;
+  // discount = nominal yang benar-benar dipakai (mode persen ikut subtotal)
+  const { subtotal, total, count, discount, discountPct } = cart.totals;
 
   const payMethods = activeMethods;
   const plainMethods = activeMethods.filter((m) => m.kind !== 'debt');
@@ -278,11 +279,12 @@ export function OrderPanel({ onClose, onQuickSale }: { onClose?: () => void; onQ
                       Hapus
                     </button>
                   }
-                  error={discount > subtotal ? 'Diskon lebih besar dari subtotal.' : null}
+                  error={!discountPct && cart.state.discount > subtotal ? 'Diskon lebih besar dari subtotal.' : null}
+                  hint={discountPct ? `${discountPct}% dari subtotal, ikut berubah kalau pesanan berubah.` : undefined}
                 >
                   <MoneyInput
                     id="cart-discount"
-                    value={discountText}
+                    value={discountPct ? amountToInput(discount) : discountText}
                     onValueChange={(t) => {
                       setDiscountText(t);
                       cart.setDiscount(parseAmount(t) ?? 0);
@@ -292,13 +294,14 @@ export function OrderPanel({ onClose, onQuickSale }: { onClose?: () => void; onQ
                 </Field>
                 <div className="mt-2 flex gap-2">
                   {[5, 10, 20].map((pct) => {
-                    const value = roundMoney(Math.round((subtotal * pct) / 100));
+                    // persis sampai piaster, tidak dibulatkan ke pound, dan ikut subtotal
+                    const value = roundMoney((subtotal * pct) / 100);
                     return (
                       <Chip
                         key={pct}
-                        selected={discount === value && value > 0}
+                        selected={discountPct === pct}
                         onClick={() => {
-                          cart.setDiscount(value);
+                          cart.setDiscountPct(pct);
                           setDiscountText(amountToInput(value));
                         }}
                       >
@@ -387,7 +390,7 @@ export function OrderPanel({ onClose, onQuickSale }: { onClose?: () => void; onQ
           {discount > 0 && (
             <>
               <Row label="Subtotal" value={<Money value={subtotal} />} className="py-0.5" />
-              <Row label="Diskon" value={<Money value={-Math.min(discount, subtotal)} />} className="py-0.5" />
+              <Row label={discountPct ? `Diskon ${discountPct}%` : 'Diskon'} value={<Money value={-discount} />} className="py-0.5" />
             </>
           )}
           {isDebt && dp > 0 && dp < total && (

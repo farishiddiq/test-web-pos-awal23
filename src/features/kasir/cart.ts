@@ -28,13 +28,15 @@ export interface CartCustomer {
 export interface CartState {
   lines: CartLine[];
   discount: number;
+  /** Diskon persen: kalau diisi, nominal diskon ikut subtotal (persis sampai piaster) */
+  discountPct?: number | null;
   customer: CartCustomer | null;
   note: string;
   /** Kunci idempotensi. Sama selama isi keranjang sama, jadi kirim ulang saat sinyal putus tidak dobel. */
   clientRef: string;
 }
 
-const emptyCart = (): CartState => ({ lines: [], discount: 0, customer: null, note: '', clientRef: uuid() });
+const emptyCart = (): CartState => ({ lines: [], discount: 0, discountPct: null, customer: null, note: '', clientRef: uuid() });
 
 type Store = { state: CartState; listeners: Set<() => void> };
 const stores = new Map<string, Store>();
@@ -65,9 +67,10 @@ function update(businessId: string, recipe: (state: CartState) => CartState, kee
 
 export function cartTotals(state: CartState) {
   const subtotal = roundMoney(state.lines.reduce((t, l) => t + roundMoney(l.qty * l.price), 0));
-  const discount = Math.min(state.discount, subtotal);
+  const raw = state.discountPct ? roundMoney((subtotal * state.discountPct) / 100) : state.discount;
+  const discount = Math.min(raw, subtotal);
   const count = state.lines.reduce((t, l) => t + l.qty, 0);
-  return { subtotal, discount, total: roundMoney(subtotal - discount), count };
+  return { subtotal, discount, discountPct: state.discountPct ?? null, total: roundMoney(subtotal - discount), count };
 }
 
 export function useCart(businessId: string) {
@@ -146,7 +149,10 @@ export function useCart(businessId: string) {
         update(businessId, (s) => ({ ...s, lines: s.lines.filter((l) => l.key !== key) }));
       },
       setDiscount(discount: number) {
-        update(businessId, (s) => ({ ...s, discount: Math.max(0, discount) }));
+        update(businessId, (s) => ({ ...s, discount: Math.max(0, discount), discountPct: null }));
+      },
+      setDiscountPct(pct: number | null) {
+        update(businessId, (s) => ({ ...s, discount: 0, discountPct: pct && pct > 0 ? pct : null }));
       },
       setCustomer(customer: CartCustomer | null) {
         update(businessId, (s) => ({ ...s, customer }));
