@@ -73,7 +73,7 @@ export function PhoneShot({ src, alt, eager, className }: { src: string; alt: st
 /** Tepat di bawah hero: dashboard asli di laptop dan HP */
 export function Showcase() {
   return (
-    <section aria-label="Tampilan Possir" className="relative z-10 mx-auto -mt-32 max-w-[1200px] px-5 md:-mt-44 md:px-8">
+    <section aria-label="Tampilan Possir" className="mx-auto max-w-[1200px] px-5 pt-20 md:px-8 md:pt-28">
       <div className="grid grid-cols-1 items-end gap-6 md:grid-cols-[minmax(0,1fr)_220px] lg:grid-cols-[minmax(0,1fr)_250px] lg:gap-8">
         <DesktopShot
           src="/screens/dashboard-desktop.webp"
@@ -296,7 +296,7 @@ export function EgyptDetails() {
 }
 
 /** Potongan screenshot asli (kartu atau panel), dipotong dari atas bila terlalu tinggi */
-function ClipShot({ src, alt, width, height, maxH, className }: { src: string; alt: string; width: number; height: number; maxH?: string; className?: string }) {
+export function ClipShot({ src, alt, width, height, maxH, className }: { src: string; alt: string; width: number; height: number; maxH?: string; className?: string }) {
   return (
     <div className={cn('overflow-hidden rounded-[18px] border border-line bg-surface shadow-[var(--shadow-card)]', className)} style={maxH ? { maxHeight: maxH } : undefined}>
       <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" className="block h-auto w-full" />
