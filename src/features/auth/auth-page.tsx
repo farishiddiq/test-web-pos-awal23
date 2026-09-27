@@ -1,10 +1,10 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowDown, ArrowRight, EnvelopeSimple, Eye, EyeSlash, PlayCircle } from '@phosphor-icons/react';
+import { ArrowDown, ArrowRight, At, EnvelopeSimple, Eye, EyeSlash, LockSimple, PlayCircle, User } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { useSession } from '@/data/session';
 import { Button } from '@/components/ui/button';
-import { Field, TextInput } from '@/components/ui/form';
+import { TextInput } from '@/components/ui/form';
 import { normalizeUsername, toAuthEmail, usernameError } from '@/lib/username';
 import { cn } from '@/lib/util';
 import { AuthBrand } from './auth-brand';
@@ -150,25 +150,46 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
     }
   };
 
+
   const demoButton = (
     <button
       type="button"
       onClick={openDemo}
       disabled={demoBusy}
-      className="pressable inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime px-6 text-[15px] font-bold text-on-lime ring-1 ring-inset ring-[color-mix(in_oklab,var(--on-lime)_14%,transparent)] hover:brightness-105 disabled:opacity-70"
+      className="pressable inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime px-6 text-[15px] font-bold text-on-lime ring-1 ring-inset ring-[color-mix(in_oklab,var(--on-lime)_22%,transparent)] hover:brightness-105 disabled:opacity-70"
     >
-      <PlayCircle size={20} weight="fill" aria-hidden />
+      <PlayCircle size={20} aria-hidden />
       {demoBusy ? 'Menyiapkan demo…' : 'Lihat demo tanpa daftar'}
     </button>
   );
 
+  // baris status: titik hanya menyatakan keadaan nyata (server akun tersambung, atau mode demo)
+  const statusRow = (
+    <div className="flex items-center justify-between gap-3">
+      <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-brand-ink">
+        <span className={cn('size-2 rounded-full', supabaseReady ? 'bg-brand' : 'bg-[var(--warn-ink)]')} aria-hidden />
+        {supabaseReady ? 'Sistem kasir aktif' : 'Mode demo'}
+      </span>
+      <span className="inline-flex items-center rounded-full border border-line px-2.5 py-1 text-[11px] font-bold tracking-[0.04em] text-ink-3" title="Bahasa Indonesia, untuk usaha di Mesir">
+        ID / EG
+      </span>
+    </div>
+  );
+
+  const heading = (title: string, sub: string) => (
+    <div className="mt-5 [@media(max-height:820px)]:mt-4">
+      <h1 className="text-[32px] font-bold leading-[1.05] tracking-[-0.035em] xl:text-[38px] [@media(max-height:820px)]:text-[30px]">{title}</h1>
+      <p className="mt-2 text-[14.5px] text-ink-3">{sub}</p>
+    </div>
+  );
+
   if (!supabaseReady) {
     return (
-      <div className="text-center">
-        <h1 className="text-[28px] font-bold tracking-[-0.03em] xl:text-[32px]">Coba Possir sekarang</h1>
-        <p className="mx-auto mt-2 max-w-[36ch] text-[15px] text-ink-3">5 minggu data contoh toko barang Indonesia dan Asia. Berjalan di browser kamu, tanpa daftar.</p>
+      <div>
+        {statusRow}
+        {heading('Coba Possir sekarang', '5 minggu data contoh toko barang Indonesia dan Asia, tanpa daftar.')}
         <div className="mt-6">{demoButton}</div>
-        <div className="mt-6 rounded-[16px] bg-surface-2 p-4 text-left text-[13px] leading-relaxed text-ink-2">
+        <div className="mt-5 rounded-[16px] bg-surface-2 p-4 text-[13px] leading-relaxed text-ink-2">
           <p className="font-semibold text-ink">Untuk akun sungguhan</p>
           <p className="mt-1">
             Hubungkan Supabase: isi <code className="rounded bg-surface-3 px-1 py-0.5 text-[12px]">VITE_SUPABASE_URL</code> dan{' '}
@@ -181,12 +202,12 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
 
   if (sent) {
     return (
-      <div className="text-center">
-        <div className="mx-auto grid size-14 place-items-center rounded-full bg-brand-soft text-brand-ink">
+      <div>
+        {statusRow}
+        <div className="mt-6 grid size-14 place-items-center rounded-full bg-brand-soft text-brand-ink">
           <EnvelopeSimple size={28} />
         </div>
-        <h1 className="mt-4 text-[26px] font-bold tracking-[-0.02em]">Cek email kamu</h1>
-        <p className="mx-auto mt-2 max-w-[34ch] text-[14.5px] text-ink-2">{`Kalau ${login.trim()} terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim.`}</p>
+        {heading('Cek email kamu', `Kalau ${login.trim()} terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim.`)}
         <Button variant="secondary" className="mt-6" onClick={() => switchMode('login')}>
           Kembali ke halaman masuk
         </Button>
@@ -194,55 +215,91 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
     );
   }
 
+  const fieldClass = 'border-transparent bg-surface-2 pl-11 focus:bg-surface';
+  const labelRow = (text: string, htmlFor: string, aside?: ReactNode) => (
+    <div className="flex items-baseline justify-between gap-3">
+      <label htmlFor={htmlFor} className="text-[13.5px] font-semibold text-ink-2">
+        {text}
+      </label>
+      {aside}
+    </div>
+  );
+  const iconClass = 'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-3';
+
   return (
     <form onSubmit={submit} noValidate>
-      <div className="text-center">
-        <h1 className="text-[28px] font-bold tracking-[-0.03em] xl:text-[32px]">{TITLES[mode]}</h1>
-        <p className="mx-auto mt-2 max-w-[36ch] text-[15px] text-ink-3">
-          {mode === 'forgot'
-            ? 'Khusus akun lama yang daftar pakai email. Akun username: minta admin Possir mengatur ulang kata sandimu.'
-            : 'Kasir, stok, dan piutang untuk usaha Masisir.'}
-        </p>
-      </div>
+      {statusRow}
+      {heading(
+        TITLES[mode],
+        mode === 'forgot'
+          ? 'Khusus akun lama yang daftar pakai email. Akun username: minta admin Possir mengatur ulang kata sandimu.'
+          : 'Kasir, stok, dan piutang untuk usaha Masisir di Kairo.',
+      )}
 
       {mode !== 'forgot' && (
         <>
-          <div className="mt-6">{demoButton}</div>
-          <div className="my-5 flex items-center gap-3 text-[13px] text-ink-3 [@media(max-height:820px)]:my-3.5">
+          <div className="mt-6 [@media(max-height:820px)]:mt-4">{demoButton}</div>
+          <div className="my-5 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ink-3 [@media(max-height:820px)]:my-3.5">
             <span className="h-px flex-1 bg-line" />
-            atau pakai username
+            atau pakai akun
             <span className="h-px flex-1 bg-line" />
           </div>
         </>
       )}
 
-      <div className={cn('grid gap-4 [@media(max-height:820px)]:gap-3', mode === 'forgot' && 'mt-8')}>
+      <div className={cn('grid gap-4 [@media(max-height:820px)]:gap-3', mode === 'forgot' && 'mt-6')}>
         {mode === 'register' && (
-          <Field label="Nama kamu" htmlFor="auth-name">
-            <TextInput id="auth-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Misal: Ahmad Fauzi" />
-          </Field>
-        )}
-        {mode === 'forgot' ? (
-          <Field label="Email akun" htmlFor="auth-login">
-            <TextInput id="auth-login" type="email" inputMode="email" autoComplete="email" value={login} onChange={(e) => setLogin(e.target.value)} placeholder="nama@email.com" />
-          </Field>
-        ) : (
-          <Field label="Username" htmlFor="auth-login" hint={mode === 'register' ? 'Huruf kecil, angka, titik, atau garis bawah.' : undefined}>
-            <TextInput
-              id="auth-login"
-              autoComplete="username"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              value={login}
-              onChange={(e) => setLogin(mode === 'register' ? e.target.value.toLowerCase().replace(/\s/g, '') : e.target.value)}
-              placeholder="misal: ahmad.fauzi"
-            />
-          </Field>
-        )}
-        {mode !== 'forgot' && (
-          <Field label="Kata sandi" htmlFor="auth-password">
+          <div className="grid gap-1.5">
+            {labelRow('Nama kamu', 'auth-name')}
             <div className="relative">
+              <User size={18} className={iconClass} aria-hidden />
+              <TextInput id="auth-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Misal: Ahmad Fauzi" className={fieldClass} />
+            </div>
+          </div>
+        )}
+
+        {mode === 'forgot' ? (
+          <div className="grid gap-1.5">
+            {labelRow('Email akun', 'auth-login')}
+            <div className="relative">
+              <EnvelopeSimple size={18} className={iconClass} aria-hidden />
+              <TextInput id="auth-login" type="email" inputMode="email" autoComplete="email" value={login} onChange={(e) => setLogin(e.target.value)} placeholder="nama@email.com" className={fieldClass} />
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-1.5">
+            {labelRow('Username', 'auth-login')}
+            <div className="relative">
+              <At size={18} className={iconClass} aria-hidden />
+              <TextInput
+                id="auth-login"
+                autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                value={login}
+                onChange={(e) => setLogin(mode === 'register' ? e.target.value.toLowerCase().replace(/\s/g, '') : e.target.value)}
+                placeholder="ahmad.fauzi"
+                className={fieldClass}
+              />
+            </div>
+            {mode === 'register' && <p className="text-[12.5px] text-ink-3">Huruf kecil, angka, titik, atau garis bawah.</p>}
+          </div>
+        )}
+
+        {mode !== 'forgot' && (
+          <div className="grid gap-1.5">
+            {labelRow(
+              'Kata sandi',
+              'auth-password',
+              mode === 'login' ? (
+                <button type="button" onClick={() => switchMode('forgot')} className="text-[13px] font-semibold text-brand hover:underline">
+                  Lupa sandi?
+                </button>
+              ) : undefined,
+            )}
+            <div className="relative">
+              <LockSimple size={18} className={iconClass} aria-hidden />
               <TextInput
                 id="auth-password"
                 type={showPassword ? 'text' : 'password'}
@@ -250,38 +307,38 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
                 placeholder={mode === 'register' ? 'Minimal 6 karakter' : undefined}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pr-12"
+                className={cn(fieldClass, 'pr-12')}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                 aria-pressed={showPassword}
-                className="absolute right-1.5 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-ink-3 hover:bg-surface-2 hover:text-ink"
+                className="absolute right-1.5 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-ink-3 hover:bg-surface-3 hover:text-ink"
               >
                 {showPassword ? <EyeSlash size={20} aria-hidden /> : <Eye size={20} aria-hidden />}
               </button>
             </div>
-          </Field>
-        )}
-        {mode === 'login' && (
-          <div className="-mt-1 text-right">
-            <button type="button" onClick={() => switchMode('forgot')} className="text-[14px] font-semibold text-brand hover:underline">
-              Lupa kata sandi?
-            </button>
           </div>
         )}
+
         {error && (
           <p role="alert" className="rounded-[12px] bg-danger-soft px-3.5 py-2.5 text-[14px] font-medium text-danger-ink">
             {error}
           </p>
         )}
-        <Button type="submit" size="lg" block loading={busy} loadingText="Sebentar…">
-          {mode === 'login' ? 'Masuk' : mode === 'register' ? 'Daftar gratis' : 'Kirim tautan'}
-        </Button>
+
+        <button
+          type="submit"
+          disabled={busy}
+          className="pressable mt-1 inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15.5px] font-bold text-canvas hover:bg-brand disabled:opacity-70 dark:bg-lime dark:text-on-lime"
+        >
+          {busy ? 'Sebentar…' : mode === 'login' ? 'Masuk ke Kasir' : mode === 'register' ? 'Daftar gratis' : 'Kirim tautan'}
+          {!busy && <ArrowRight size={18} weight="bold" aria-hidden />}
+        </button>
       </div>
 
-      <p className="mt-5 text-center text-[14.5px] text-ink-2">
+      <p className="mt-5 text-center text-[14px] text-ink-2">
         {mode === 'login' ? (
           <>
             Belum punya akun?{' '}
