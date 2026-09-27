@@ -15,7 +15,7 @@ npm run dev
 
 Buka http://localhost:5173 lalu pilih **Lihat demo**. Demo menjalankan Postgres asli di browser
 (PGlite) dengan skema SQL yang sama persis dengan Supabase, berisi 5 minggu data contoh
-"Dapur Ahmad". Data demo hanya tersimpan di browser itu. Kunjungan pertama mengunduh mesin
+"Pasar Asia Ahmad" (toko barang Indonesia dan Asia). Data demo hanya tersimpan di browser itu. Kunjungan pertama mengunduh mesin
 database sekitar 10 MB; berikutnya langsung terbuka.
 
 ## Hubungkan ke Supabase

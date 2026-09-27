@@ -265,13 +265,13 @@ export function EgyptDetails() {
               <p className="mt-1.5 max-w-[40ch] text-[14.5px] text-ink-2">Ringkasan harian atau bulanan siap dikirim ke partner usaha dengan satu ketukan.</p>
             </div>
             <div className="rounded-[18px] rounded-tl-[6px] bg-surface p-4 text-[13.5px] leading-relaxed shadow-[var(--shadow-card)]">
-              <p className="font-bold">Laporan Dapur Ahmad</p>
+              <p className="font-bold">Laporan Pasar Asia Ahmad</p>
               <p className="text-ink-3">Kamis, 24 September</p>
               <p className="mt-2">
-                Penjualan <b>EGP 2.310</b> dari 19 transaksi
+                Penjualan <b>EGP 2.310</b> dari 11 transaksi
               </p>
               <p>
-                Laba bersih <b>EGP 910</b>
+                Laba bersih <b>EGP 640</b>
               </p>
               <p className="mt-2 flex items-center gap-1.5 text-[12.5px] text-ink-3">
                 <ChatCircleText size={15} aria-hidden /> Dikirim lewat Possir

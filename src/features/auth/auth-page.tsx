@@ -146,7 +146,7 @@ function AuthCard({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
         <div>
           <h2 className="text-[22px] font-bold tracking-[-0.02em]">Coba Possir sekarang</h2>
           <p className="mt-2 text-[14px] leading-relaxed text-ink-2">
-            Demo berisi 5 minggu data usaha makanan contoh. Semua berjalan di browser kamu, tanpa daftar.
+            Demo berisi 5 minggu data contoh toko barang Indonesia dan Asia. Semua berjalan di browser kamu, tanpa daftar.
           </p>
           <Button size="lg" block className="mt-6" onClick={openDemo} loading={demoBusy} loadingText="Menyiapkan demo…" iconRight={<ArrowRight size={18} weight="bold" />}>
             Lihat demo

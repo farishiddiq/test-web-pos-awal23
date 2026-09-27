@@ -507,7 +507,7 @@ function DemoSection() {
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
   return (
-    <Section title="Data demo" description="Kembalikan data contoh Dapur Ahmad seperti awal. Semua perubahanmu di demo akan hilang.">
+    <Section title="Data demo" description="Kembalikan data contoh Pasar Asia Ahmad seperti awal. Semua perubahanmu di demo akan hilang.">
       <Button
         variant={confirm ? 'danger' : 'secondary'}
         icon={<ArrowCounterClockwise size={17} />}

@@ -133,7 +133,7 @@ try {
   await evaluate(`document.activeElement?.blur(); document.dispatchEvent(new PointerEvent('pointerdown')); true`);
   await shot('laporan-desktop');
   await go('/kasir', `document.querySelectorAll('main button').length > 10`);
-  for (const name of ['Nasi Ayam Geprek', 'Nasi Ayam Geprek', 'Es Teh Manis', 'Mie Ayam Bakso']) {
+  for (const name of ['Indomie Goreng Original', 'Indomie Goreng Original', 'Indomie Goreng Original', 'Kecap Manis Bango', 'Beng-Beng', 'Kerupuk Udang Finna']) {
     await evaluate(`(() => { const b = [...document.querySelectorAll('main button')].find((x) => x.textContent.includes(${JSON.stringify(name)})); b?.click(); return Boolean(b); })()`);
     await sleep(150);
   }

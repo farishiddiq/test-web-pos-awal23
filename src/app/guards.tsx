@@ -10,7 +10,7 @@ import { Page } from '@/components/layout/app-shell';
 
 const DEMO_STAGE_TEXT = {
   engine: 'Menyalakan database di browser…',
-  seed: 'Mengisi 5 minggu data contoh Dapur Ahmad…',
+  seed: 'Mengisi 5 minggu data contoh Pasar Asia Ahmad…',
   ready: 'Hampir siap…',
 } as const;
 

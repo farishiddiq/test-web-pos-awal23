@@ -6,7 +6,7 @@ import { DEMO_USER } from './constants';
 worker({
   async init(options) {
     const db = await PGlite.create({ dataDir: options.dataDir });
-    // Mode demo selalu masuk sebagai pemilik "Dapur Ahmad"
+    // Mode demo selalu masuk sebagai pemilik "Pasar Asia Ahmad"
     await db.exec(`set request.jwt.claim.sub = '${DEMO_USER.id}'`);
     return db;
   },
