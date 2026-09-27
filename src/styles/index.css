@@ -444,14 +444,35 @@
   border: 1px solid rgb(21 32 27 / 0.06);
 }
 
-/* Pil "Gulir untuk lihat fitur": muncul setelah halaman tampil, panah mengangguk
-   tiga kali saja (bukan loop terus-menerus) lalu diam. */
+/* Pil "Gulir untuk lihat fitur": muncul setelah halaman tampil, lalu memantul
+   kecil (lompat, jatuh, pantul sekali lagi) dan istirahat sebelum mengulang.
+   `transform` dipakai untuk pantulan, `translate` tetap untuk posisi tengah. */
 @media (prefers-reduced-motion: no-preference) {
   .scroll-cue {
-    animation: cue-in 500ms var(--ease-out) 600ms both;
+    animation:
+      cue-in 500ms var(--ease-out) 600ms both,
+      cue-bounce 2400ms 1400ms infinite;
   }
-  .cue-arrow {
-    animation: cue-nudge 1100ms ease-in-out 1300ms 3;
+  .scroll-cue:hover {
+    animation-play-state: running, paused;
+  }
+}
+@keyframes cue-bounce {
+  0%, 44%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  12% {
+    transform: translateY(-9px);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  24% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  32% {
+    transform: translateY(-3px);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
   }
 }
 @keyframes cue-in {
@@ -463,10 +484,6 @@
     opacity: 1;
     translate: -50% 50%;
   }
-}
-@keyframes cue-nudge {
-  0%, 100% { transform: translateY(0); }
-  45% { transform: translateY(4px); }
 }
 
 /* Panel identitas di halaman masuk: pola titik halus + cahaya lime tipis di sudut */

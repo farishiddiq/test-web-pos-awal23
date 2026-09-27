@@ -163,21 +163,8 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
     </button>
   );
 
-  // baris status: titik hanya menyatakan keadaan nyata (server akun tersambung, atau mode demo)
-  const statusRow = (
-    <div className="flex items-center justify-between gap-3">
-      <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-brand-ink">
-        <span className={cn('size-2 rounded-full', supabaseReady ? 'bg-brand' : 'bg-[var(--warn-ink)]')} aria-hidden />
-        {supabaseReady ? 'Sistem kasir aktif' : 'Mode demo'}
-      </span>
-      <span className="inline-flex items-center rounded-full border border-line px-2.5 py-1 text-[11px] font-bold tracking-[0.04em] text-ink-3" title="Bahasa Indonesia, untuk usaha di Mesir">
-        ID / EG
-      </span>
-    </div>
-  );
-
   const heading = (title: string, sub: string) => (
-    <div className="mt-5 [@media(max-height:820px)]:mt-4">
+    <div>
       <h1 className="text-[32px] font-bold leading-[1.05] tracking-[-0.035em] xl:text-[38px] [@media(max-height:820px)]:text-[30px]">{title}</h1>
       <p className="mt-2 text-[14.5px] text-ink-3">{sub}</p>
     </div>
@@ -186,7 +173,6 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
   if (!supabaseReady) {
     return (
       <div>
-        {statusRow}
         {heading('Coba Possir sekarang', '5 minggu data contoh toko barang Indonesia dan Asia, tanpa daftar.')}
         <div className="mt-6">{demoButton}</div>
         <div className="mt-5 rounded-[16px] bg-surface-2 p-4 text-[13px] leading-relaxed text-ink-2">
@@ -203,8 +189,7 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
   if (sent) {
     return (
       <div>
-        {statusRow}
-        <div className="mt-6 grid size-14 place-items-center rounded-full bg-brand-soft text-brand-ink">
+        <div className="mb-5 grid size-14 place-items-center rounded-full bg-brand-soft text-brand-ink">
           <EnvelopeSimple size={28} />
         </div>
         {heading('Cek email kamu', `Kalau ${login.trim()} terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim.`)}
@@ -228,7 +213,6 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
 
   return (
     <form onSubmit={submit} noValidate>
-      {statusRow}
       {heading(
         TITLES[mode],
         mode === 'forgot'

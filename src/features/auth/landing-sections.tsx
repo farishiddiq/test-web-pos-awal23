@@ -163,8 +163,8 @@ export function FeatureTour() {
       onFocus={() => setHold(true)}
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && setHold(false)}
     >
-      <h2 className="max-w-[18ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">
-        Semua yang dicatat usaha kecil, di satu HP.
+      <h2 className="max-w-[22ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">
+        Jualan, stok, sampai utang pelanggan, cukup dicatat dari HP.
       </h2>
       <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)] lg:gap-12">
         <div role="tablist" aria-label="Fitur Possir" aria-orientation="vertical" className="grid content-start gap-2">
@@ -509,7 +509,7 @@ export function FactsBand() {
         <span aria-hidden className="brand-rings -bottom-56 -right-32 -z-10 size-[480px] border-[72px]" />
         <div className="mx-auto max-w-[1200px]">
           <h2 className="max-w-[22ch] text-[30px] font-bold leading-[1.1] tracking-[-0.03em] md:text-[40px]">
-            Dibuat untuk cara jualan <span className="text-lime">Masisir</span>.
+            Pas sama cara jualan anak <span className="text-lime">Masisir</span> sehari-hari.
           </h2>
           <dl className="mt-12 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
             {FACTS.map(([big, text], i) => (
