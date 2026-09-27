@@ -7,6 +7,7 @@ import { Logo } from '@/components/layout/logo';
 import { Button } from '@/components/ui/button';
 import { Field, TextInput } from '@/components/ui/form';
 import { normalizeUsername, toAuthEmail, usernameError } from '@/lib/username';
+import { cn } from '@/lib/util';
 import { AuthShowcase } from './auth-showcase';
 import { BrandFooter, BusinessMarquee, EgyptDetails, FactsBand, FeatureTour, FinalCta, GrowthFeatures, Showcase, Testimonials } from './landing-sections';
 
@@ -31,9 +32,10 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
   return (
     <div className="landing min-h-dvh overflow-x-clip">
       {/* Layar masuk: form di kiri, panel merek dengan screenshot asli di kanan */}
-      <section className="p-2.5 md:p-4 lg:p-6">
-        <div className="mx-auto grid min-h-[calc(100dvh-20px)] max-w-[1320px] grid-cols-1 gap-2.5 rounded-[32px] bg-surface p-2.5 shadow-[var(--shadow-float)] md:min-h-[calc(100dvh-32px)] md:p-3 lg:min-h-[calc(100dvh-48px)] lg:grid-cols-2">
-          <div className="flex min-w-0 flex-col px-4 pb-4 pt-4 md:px-8 md:pt-6 lg:px-12">
+      {/* Di laptop: tepat satu layar (100dvh), isi menyesuaikan tinggi layar */}
+      <section className="p-2.5 md:p-4 lg:h-[100dvh] lg:min-h-[600px] lg:p-5">
+        <div className="mx-auto grid min-h-[calc(100dvh-20px)] max-w-[1320px] grid-cols-1 gap-2.5 rounded-[32px] bg-surface p-2.5 shadow-[var(--shadow-float)] md:min-h-[calc(100dvh-32px)] md:p-3 lg:h-full lg:min-h-0 lg:grid-cols-2">
+          <div className="flex min-w-0 flex-col px-4 pb-4 pt-4 md:px-8 md:pt-6 lg:min-h-0 lg:overflow-y-auto lg:px-12 lg:pt-5">
             <div className="flex items-center justify-between gap-3">
               <Logo />
               <a href="#fitur" className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[14px] font-semibold text-ink-2 hover:text-ink">
@@ -41,17 +43,17 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
               </a>
             </div>
 
-            <div ref={formRef} id="akun" className="mx-auto flex w-full max-w-[420px] flex-1 scroll-mt-24 flex-col justify-center py-10">
+            <div ref={formRef} id="akun" className="mx-auto flex w-full max-w-[420px] flex-1 scroll-mt-24 flex-col justify-center py-8 lg:py-5 lg:[@media(max-height:820px)]:py-2">
               <AuthForm mode={mode} onModeChange={setMode} />
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 text-[13.5px] text-ink-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-[13.5px] text-ink-3 lg:[@media(max-height:820px)]:hidden">
               <a href="#testimoni" className="hover:text-ink">Testimoni</a>
               <span>© 2026 Possir</span>
             </div>
           </div>
 
-          <AuthShowcase className="min-h-[560px] lg:min-h-0" />
+          <AuthShowcase className="min-h-[560px] lg:h-full lg:min-h-0" />
         </div>
       </section>
 
@@ -155,9 +157,9 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
   if (!supabaseReady) {
     return (
       <div className="text-center">
-        <h1 className="text-[30px] font-bold tracking-[-0.03em] md:text-[34px]">Coba Possir sekarang</h1>
+        <h1 className="text-[28px] font-bold tracking-[-0.03em] xl:text-[32px]">Coba Possir sekarang</h1>
         <p className="mx-auto mt-2 max-w-[36ch] text-[15px] text-ink-3">5 minggu data contoh toko barang Indonesia dan Asia. Berjalan di browser kamu, tanpa daftar.</p>
-        <div className="mt-8">{demoButton}</div>
+        <div className="mt-6">{demoButton}</div>
         <div className="mt-6 rounded-[16px] bg-surface-2 p-4 text-left text-[13px] leading-relaxed text-ink-2">
           <p className="font-semibold text-ink">Untuk akun sungguhan</p>
           <p className="mt-1">
@@ -187,7 +189,7 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
   return (
     <form onSubmit={submit} noValidate>
       <div className="text-center">
-        <h1 className="text-[30px] font-bold tracking-[-0.03em] md:text-[34px]">{TITLES[mode]}</h1>
+        <h1 className="text-[28px] font-bold tracking-[-0.03em] xl:text-[32px]">{TITLES[mode]}</h1>
         <p className="mx-auto mt-2 max-w-[36ch] text-[15px] text-ink-3">
           {mode === 'forgot'
             ? 'Khusus akun lama yang daftar pakai email. Akun username: minta admin Possir mengatur ulang kata sandimu.'
@@ -197,8 +199,8 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
 
       {mode !== 'forgot' && (
         <>
-          <div className="mt-8">{demoButton}</div>
-          <div className="my-6 flex items-center gap-3 text-[13px] text-ink-3">
+          <div className="mt-6">{demoButton}</div>
+          <div className="my-5 flex items-center gap-3 text-[13px] text-ink-3 [@media(max-height:820px)]:my-3.5">
             <span className="h-px flex-1 bg-line" />
             atau pakai username
             <span className="h-px flex-1 bg-line" />
@@ -206,7 +208,7 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
         </>
       )}
 
-      <div className={mode === 'forgot' ? 'mt-8 grid gap-4' : 'grid gap-4'}>
+      <div className={cn('grid gap-4 [@media(max-height:820px)]:gap-3', mode === 'forgot' && 'mt-8')}>
         {mode === 'register' && (
           <Field label="Nama kamu" htmlFor="auth-name">
             <TextInput id="auth-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Misal: Ahmad Fauzi" />
@@ -217,7 +219,7 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
             <TextInput id="auth-login" type="email" inputMode="email" autoComplete="email" value={login} onChange={(e) => setLogin(e.target.value)} placeholder="nama@email.com" />
           </Field>
         ) : (
-          <Field label="Username" htmlFor="auth-login" hint={mode === 'register' ? 'Huruf kecil, angka, titik, atau garis bawah. Minimal 3 karakter.' : undefined}>
+          <Field label="Username" htmlFor="auth-login" hint={mode === 'register' ? 'Huruf kecil, angka, titik, atau garis bawah.' : undefined}>
             <TextInput
               id="auth-login"
               autoComplete="username"
@@ -231,12 +233,13 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
           </Field>
         )}
         {mode !== 'forgot' && (
-          <Field label="Kata sandi" htmlFor="auth-password" hint={mode === 'register' ? 'Minimal 6 karakter.' : undefined}>
+          <Field label="Kata sandi" htmlFor="auth-password">
             <div className="relative">
               <TextInput
                 id="auth-password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                placeholder={mode === 'register' ? 'Minimal 6 karakter' : undefined}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="pr-12"
@@ -270,7 +273,7 @@ function AuthForm({ mode, onModeChange }: { mode: Mode; onModeChange: (mode: Mod
         </Button>
       </div>
 
-      <p className="mt-6 text-center text-[14.5px] text-ink-2">
+      <p className="mt-5 text-center text-[14.5px] text-ink-2">
         {mode === 'login' ? (
           <>
             Belum punya akun?{' '}

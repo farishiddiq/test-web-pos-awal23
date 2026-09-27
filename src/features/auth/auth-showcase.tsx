@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/util';
-import { ClipShot, PhoneShot } from './landing-sections';
+import { ClipShot } from './landing-sections';
 
 // Panel merek di samping form masuk: screenshot asli (npm run screenshots) yang berganti,
 // dengan satu kartu potongan layar lain yang "melayang" seperti di contoh desain.
@@ -44,7 +44,7 @@ export function AuthShowcase({ className }: { className?: string }) {
     <section
       aria-label="Fitur Possir"
       aria-roledescription="carousel"
-      className={cn('relative isolate flex flex-col overflow-hidden rounded-[26px] bg-[var(--deep)] px-6 pb-8 pt-10 text-[var(--on-deep)] md:px-10', className)}
+      className={cn('relative isolate flex flex-col overflow-hidden rounded-[26px] bg-[var(--deep)] px-6 pb-6 pt-8 text-[var(--on-deep)] md:px-10 lg:pt-10', className)}
       onPointerEnter={(e) => e.pointerType === 'mouse' && setHold(true)}
       onPointerLeave={() => setHold(false)}
       onFocus={() => setHold(true)}
@@ -54,24 +54,37 @@ export function AuthShowcase({ className }: { className?: string }) {
       <span aria-hidden className="brand-rings -bottom-48 -left-40 -z-10 size-[380px] border-[56px]" />
 
       {/* komposisi screenshot */}
-      <div key={index} className="tour-panel relative mx-auto grid w-full max-w-[440px] flex-1 place-items-center py-2">
-        <PhoneShot src={slide.phone.src} alt={slide.phone.alt} eager={index === 0} className="w-[min(230px,58%)] lg:w-[min(250px,60%)]" />
-        <ClipShot
-          src={slide.card.src}
-          alt={slide.card.alt}
-          width={slide.card.width}
-          height={slide.card.height}
-          maxH={'maxH' in slide.card ? slide.card.maxH : undefined}
-          className={cn('absolute bottom-[8%] left-0 max-w-[62%] rotate-[-2deg] shadow-[var(--shadow-float)] max-sm:hidden', slide.card.className)}
-        />
+      {/* Di laptop, tinggi HP mengikuti sisa tinggi panel supaya satu layar pas tanpa terpotong */}
+      <div key={index} className="tour-panel relative flex w-full flex-1 items-center justify-center py-2 lg:min-h-0">
+        <div className="relative w-[min(230px,58%)] lg:aspect-[390/844] lg:h-full lg:max-h-[540px] lg:w-auto">
+          <div className="rounded-[40px] bg-ink p-[9px] shadow-[var(--shadow-float)] lg:h-full dark:bg-surface-3">
+            <img
+              src={slide.phone.src}
+              alt={slide.phone.alt}
+              width={390}
+              height={844}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+              className="block h-auto w-full rounded-[32px] lg:h-full lg:object-cover lg:object-top"
+            />
+          </div>
+          <ClipShot
+            src={slide.card.src}
+            alt={slide.card.alt}
+            width={slide.card.width}
+            height={slide.card.height}
+            maxH={'maxH' in slide.card ? slide.card.maxH : undefined}
+            className={cn('absolute bottom-[8%] right-[58%] rotate-[-2deg] shadow-[var(--shadow-float)] max-sm:hidden', slide.card.className)}
+          />
+        </div>
       </div>
 
-      <div aria-live="polite" className="mx-auto mt-6 max-w-[40ch] text-center">
-        <h2 className="text-[26px] font-bold leading-tight tracking-[-0.025em] md:text-[30px]">{slide.title}</h2>
-        <p className="mt-2.5 text-[15px] leading-relaxed text-[var(--on-deep-2)]">{slide.body}</p>
+      <div aria-live="polite" className="mx-auto mt-5 max-w-[40ch] shrink-0 text-center">
+        <h2 className="text-[24px] font-bold leading-tight tracking-[-0.025em] xl:text-[28px]">{slide.title}</h2>
+        <p className="mt-2 text-[14.5px] leading-relaxed text-[var(--on-deep-2)]">{slide.body}</p>
       </div>
 
-      <div role="tablist" aria-label="Pilih fitur" className="mt-6 flex justify-center gap-2">
+      <div role="tablist" aria-label="Pilih fitur" className="mt-4 flex shrink-0 justify-center gap-2">
         {SLIDES.map((s, i) => (
           <button
             key={s.title}
