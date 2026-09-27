@@ -63,8 +63,8 @@ export function SupplierDetailPage() {
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div>
-            <p className="text-[14px] font-semibold text-ink-3">Hutang ke supplier</p>
-            <Money value={Math.max(s.balance, 0)} className="mt-0.5 block text-[36px] font-bold leading-tight tracking-[-0.03em]" />
+            <p className="text-[14px] font-semibold text-ink-3">{s.balance < 0 ? 'Lebih bayar (titipan di supplier)' : 'Hutang ke supplier'}</p>
+            <Money value={Math.abs(s.balance)} className="mt-0.5 block text-[36px] font-bold leading-tight tracking-[-0.03em]" />
           </div>
           <div>
             <p className="text-[14px] font-semibold text-ink-3">Total belanja</p>

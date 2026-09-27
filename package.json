@@ -13,7 +13,8 @@
     "test:seed": "node scripts/test-seed.mjs",
     "sql:bundle": "node scripts/bundle-sql.mjs",
     "icons": "node scripts/make-icons.mjs",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "test:audit": "node scripts/test-audit.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",

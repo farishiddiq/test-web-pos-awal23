@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { ArrowDownRight, ArrowUpRight, WarningCircle } from '@phosphor-icons/react';
 import { Button } from './button';
-import { cn, colorFor, type TileColor } from '@/lib/util';
+import { cn, colorFor, roundMoney, type TileColor } from '@/lib/util';
 import { formatAmount, formatPercent, initials, toNumber } from '@/lib/format';
 
 /** Jumlah uang: "EGP" kecil di depan angka. Angka besar pakai digit proporsional. */
@@ -16,7 +16,7 @@ export function Money({
   sign?: boolean;
   tabular?: boolean;
 }) {
-  const n = toNumber(value);
+  const n = roundMoney(toNumber(value));
   return (
     <span className={cn('whitespace-nowrap', tabular && 'tabular', className)}>
       {n < 0 ? '-' : sign && n > 0 ? '+' : ''}

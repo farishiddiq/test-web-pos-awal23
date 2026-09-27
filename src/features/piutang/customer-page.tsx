@@ -23,7 +23,7 @@ import { formatDateShort, formatDateTime } from '@/lib/dates';
 import { formatMoney } from '@/lib/format';
 import { fillReminder } from '@/lib/share-text';
 import { openWhatsApp, toWhatsAppNumber } from '@/lib/phone';
-import { cn } from '@/lib/util';
+import { cn, roundMoney } from '@/lib/util';
 import { CustomerFormSheet, ManualDebtSheet, PaymentSheet } from './customer-sheets';
 
 /** Pembayaran menutup hutang paling lama lebih dulu (FIFO) */
@@ -35,7 +35,7 @@ function settleFifo(entries: LedgerEntry[]): Map<string, number> {
   for (const d of debts) {
     const covered = Math.min(d.amount, paid);
     paid -= covered;
-    remaining.set(d.id, Math.round((d.amount - covered) * 100) / 100);
+    remaining.set(d.id, roundMoney(d.amount - covered));
   }
   return remaining;
 }

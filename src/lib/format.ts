@@ -7,6 +7,8 @@ const pctFmt = new Intl.NumberFormat('id-ID', { style: 'percent', maximumFractio
 
 export const CURRENCY = 'EGP';
 
+import { roundMoney } from './util';
+
 export function toNumber(value: unknown): number {
   const n = typeof value === 'number' ? value : Number(value);
   return Number.isFinite(n) ? n : 0;
@@ -14,14 +16,14 @@ export function toNumber(value: unknown): number {
 
 /** "1.250" atau "12,50" (desimal hanya kalau ada piaster) */
 export function formatAmount(value: number | null | undefined): string {
-  const n = Math.abs(toNumber(value));
-  const rounded = Math.round(n * 100) / 100;
+  const rounded = Math.abs(roundMoney(toNumber(value)));
   return Number.isInteger(rounded) ? intFmt.format(rounded) : decFmt.format(rounded);
 }
 
 /** "EGP 1.250", negatif jadi "-EGP 1.250" */
 export function formatMoney(value: number | null | undefined, opts: { sign?: boolean } = {}): string {
-  const n = toNumber(value);
+  // tanda dari nilai yang sudah dibulatkan: -0,000001 tampil "EGP 0", bukan "-EGP 0"
+  const n = roundMoney(toNumber(value));
   const prefix = n < 0 ? '-' : opts.sign && n > 0 ? '+' : '';
   return `${prefix}${CURRENCY} ${formatAmount(n)}`;
 }

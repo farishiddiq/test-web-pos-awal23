@@ -32,6 +32,7 @@ await db.exec(read('supabase/pglite/auth-shim.sql'));
 await db.exec(read('supabase/migrations/20260926000100_possir_tables.sql'));
 await db.exec(read('supabase/migrations/20260926000200_possir_api.sql'));
 await db.exec(read('supabase/migrations/20260927000100_possir_cashflow.sql'));
+await db.exec(read('supabase/migrations/20260928000100_possir_audit_fixes.sql'));
 console.log(`Migrasi selesai dalam ${Math.round(performance.now() - t0)} ms`);
 
 // Peta argumen fungsi publik supaya bisa dipanggil dengan parameter bernama

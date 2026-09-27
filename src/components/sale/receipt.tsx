@@ -3,9 +3,10 @@ import { Money, Row } from '@/components/ui/display';
 import { formatQty } from '@/lib/format';
 import { dateKey, formatDateLong, formatDateMedium, formatDateTime, formatTime } from '@/lib/dates';
 import type { Sale } from '@/data/types';
+import { roundMoney } from '@/lib/util';
 
 export function SaleReceipt({ sale, tz, showCost }: { sale: Sale; tz: string; showCost: boolean }) {
-  const change = sale.cash_received && sale.cash_received > sale.total ? sale.cash_received - sale.total : null;
+  const change = sale.cash_received && sale.cash_received > sale.total ? roundMoney(sale.cash_received - sale.total) : null;
   return (
     <div className="grid gap-4">
       {sale.status === 'void' && (

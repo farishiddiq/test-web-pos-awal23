@@ -11,7 +11,7 @@ import { useSales } from '@/data/queries';
 import type { SaleListItem } from '@/data/types';
 import { addDays, dateKey, relativeDayLabel, startOfMonth } from '@/lib/dates';
 import { formatCount } from '@/lib/format';
-import { cn, normalizeSearch } from '@/lib/util';
+import { cn, normalizeSearch, roundMoney } from '@/lib/util';
 import { SaleDetailSheet } from './sale-detail-sheet';
 
 type RangeKey = 'today' | 'yesterday' | 'week' | 'month' | 'custom';
@@ -78,8 +78,12 @@ export function TransaksiPage() {
     return [...map.entries()];
   }, [items, tz]);
 
+  // Tanpa pencarian: pakai ringkasan server (semua transaksi di rentang, sama dengan laporan).
+  // Dengan pencarian: hitung dari hasil yang cocok saja.
   const completed = items.filter((s) => s.status === 'completed');
-  const total = completed.reduce((t, s) => t + s.total, 0);
+  const serverSummary = !q ? query.data?.summary : undefined;
+  const count = serverSummary ? serverSummary.transactions : completed.length;
+  const total = serverSummary ? serverSummary.revenue : roundMoney(completed.reduce((t, s) => t + s.total, 0));
 
   return (
     <Page>
@@ -88,7 +92,8 @@ export function TransaksiPage() {
         subtitle={
           query.isSuccess ? (
             <>
-              {formatCount(completed.length)} transaksi, total <Money value={total} className="font-semibold text-ink-2" />
+              {formatCount(count)} transaksi, total <Money value={total} className="font-semibold text-ink-2" />
+              {q ? ' (hasil pencarian)' : ''}
             </>
           ) : (
             'Riwayat penjualan'
@@ -155,13 +160,15 @@ export function TransaksiPage() {
         ) : (
           <div className="grid gap-4">
             {groups.map(([day, sales]) => {
-              const dayTotal = sales.filter((s) => s.status === 'completed').reduce((t, s) => t + s.total, 0);
+              const done = sales.filter((s) => s.status === 'completed');
+              const dayTotal = roundMoney(done.reduce((t, s) => t + s.total, 0));
+              const dayVoids = sales.length - done.length;
               return (
                 <section key={day} className="card overflow-hidden" aria-label={relativeDayLabel(day, today)}>
                   <header className="flex items-baseline justify-between gap-3 border-b border-line px-4 py-3 md:px-5">
                     <h2 className="text-[14px] font-bold">{relativeDayLabel(day, today)}</h2>
                     <span className="text-[13px] text-ink-3">
-                      {sales.length} transaksi, <Money value={dayTotal} className="font-semibold text-ink-2" tabular />
+                      {done.length} transaksi{dayVoids > 0 ? ` + ${dayVoids} batal` : ''}, <Money value={dayTotal} className="font-semibold text-ink-2" tabular />
                     </span>
                   </header>
                   <div className="divide-y divide-line">

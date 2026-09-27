@@ -173,6 +173,8 @@ export interface SaleList {
   items: SaleListItem[];
   total_count: number;
   limit: number;
+  /** Dihitung dari semua transaksi yang cocok, bukan hanya yang tampil */
+  summary?: { transactions: number; revenue: number; voids: number };
 }
 
 export interface SaleInput {

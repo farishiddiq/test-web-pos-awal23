@@ -629,7 +629,7 @@ function CustomerPicker({ onBack, onPick }: { onBack: () => void; onPick: (c: Ca
 }
 
 function SaleSuccess({ sale, onNew, onShare }: { sale: Sale; onNew: () => void; onShare: () => void }) {
-  const change = sale.cash_received && sale.cash_received > sale.total ? sale.cash_received - sale.total : 0;
+  const change = sale.cash_received && sale.cash_received > sale.total ? roundMoney(sale.cash_received - sale.total) : 0;
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-10 text-center">

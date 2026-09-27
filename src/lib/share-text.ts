@@ -1,5 +1,6 @@
 // Teks untuk dikirim lewat WhatsApp. *tebal* dan baris baru mengikuti format WhatsApp.
 import { formatMoney, formatQty } from './format';
+import { roundMoney } from './util';
 import { dateKey, formatDateLong, formatDateMedium, formatMonth, formatTime } from './dates';
 import type { Business, Report, Sale } from '@/data/types';
 
@@ -35,7 +36,7 @@ export function saleReceiptText(sale: Sale, business: Business): string {
   }
   if (sale.cash_received && sale.cash_received > sale.total) {
     lines.push(`Uang diterima: ${formatMoney(sale.cash_received)}`);
-    lines.push(`Kembalian: ${formatMoney(sale.cash_received - sale.total)}`);
+    lines.push(`Kembalian: ${formatMoney(roundMoney(sale.cash_received - sale.total))}`);
   }
   if (sale.due_date) lines.push(`Jatuh tempo: ${formatDateMedium(sale.due_date)}`);
   lines.push('');

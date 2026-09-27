@@ -49,8 +49,15 @@ export function sum<T>(items: T[], pick: (item: T) => number): number {
   return items.reduce((total, item) => total + pick(item), 0);
 }
 
+/**
+ * Bulatkan ke 2 desimal persis seperti Postgres round(x, 2): setengah menjauhi nol.
+ * Math.round(6.175 * 100) memberi 617 karena 6.175 * 100 = 617.4999…; toPrecision
+ * membuang sisa galat biner itu dulu, jadi keranjang = struk yang tersimpan.
+ */
 export function roundMoney(n: number): number {
-  return Math.round(n * 100) / 100;
+  if (!Number.isFinite(n)) return 0;
+  const scaled = Number((Math.abs(n) * 100).toPrecision(15));
+  return (Math.sign(n) * Math.round(scaled)) / 100 || 0;
 }
 
 /** Warna tile produk tanpa foto: stabil dari nama */

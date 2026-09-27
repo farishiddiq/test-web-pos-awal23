@@ -107,6 +107,7 @@ Backend (satu antarmuka)
 | `npm run build` | Cek tipe + build produksi ke `dist/` |
 | `npm run test:sql` | 94 tes skema di PGlite: uang, stok, piutang, void, idempotensi, izin kasir, RLS, zona waktu |
 | `npm run test:seed` | Cek data demo konsisten dan realistis |
+| `npm run test:audit` | Audit angka: dashboard, laporan, arus kas, transaksi, pengeluaran, piutang, supplier, dan stok harus sama untuk periode yang sama, plus skenario ubah/batal/desimal/jumlah besar |
 | `npm run sql:bundle` | Gabungkan migrasi ke `supabase/possir.sql` |
 | `npm run icons` | Buat ulang ikon PWA |
 

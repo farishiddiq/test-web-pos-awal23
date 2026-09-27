@@ -75,7 +75,13 @@ export function SupplierPage() {
                       </span>
                       <span className="shrink-0 text-right">
                         <Money value={s.total_purchases ?? 0} tabular className="block text-[14px] font-semibold" />
-                        {s.balance > 0 ? <Badge tone="warn">Hutang {formatMoney(s.balance)}</Badge> : <span className="text-[12px] text-ink-3">Lunas</span>}
+                        {s.balance > 0 ? (
+                          <Badge tone="warn">Hutang {formatMoney(s.balance)}</Badge>
+                        ) : s.balance < 0 ? (
+                          <Badge tone="brand">Titipan {formatMoney(-s.balance)}</Badge>
+                        ) : (
+                          <span className="text-[12px] text-ink-3">Lunas</span>
+                        )}
                       </span>
                       <CaretRight size={16} className="shrink-0 text-ink-3" aria-hidden />
                     </Link>
