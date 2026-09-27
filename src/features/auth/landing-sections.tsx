@@ -25,7 +25,6 @@ import {
   Truck,
   Sliders,
   Trophy,
-  ChartLineUp,
   UsersThree,
   ClockCounterClockwise,
 } from '@phosphor-icons/react';
@@ -364,35 +363,9 @@ export function GrowthFeatures() {
           icon={Trophy}
           title="Produk terlaris dan jam laku"
           body="Lihat barang yang paling laku beserta labanya, dan jam berapa pembeli paling ramai."
-          className="md:col-span-5"
+          className="md:col-span-12"
         >
-          <ClipShot src="/screens/terlaris.webp" alt="Tabel produk terlaris dengan jumlah terjual, omzet, dan laba" width={1362} height={922} />
-        </GrowthCell>
-        <GrowthCell
-          icon={ChartLineUp}
-          title="Laba bersih"
-          body="Bukan cuma omzet. Possir mengurangi modal barang dan semua pengeluaran, jadi kamu tahu untung yang sebenarnya."
-          className="md:col-span-7"
-          dark
-        >
-          <dl className="grid gap-2.5 rounded-[18px] bg-white/[0.06] p-5 text-[15px]">
-            {(
-              [
-                ['Omzet penjualan', 'Semua transaksi yang tidak dibatalkan'],
-                ['Dikurangi modal barang', 'Harga modal barang yang terjual'],
-                ['Dikurangi pengeluaran', 'Transport, kemasan, sewa, listrik, iklan'],
-              ] as const
-            ).map(([k, v]) => (
-              <div key={k} className="flex flex-wrap items-baseline justify-between gap-x-4 border-b border-white/10 pb-2.5">
-                <dt className="font-semibold">{k}</dt>
-                <dd className="text-[13.5px] text-[var(--on-deep-2)]">{v}</dd>
-              </div>
-            ))}
-            <div className="flex items-baseline justify-between gap-4 pt-1">
-              <dt className="text-[17px] font-bold text-lime">Laba bersih</dt>
-              <dd className="text-[13.5px] text-[var(--on-deep-2)]">Harian dan bulanan, bisa dikirim ke WhatsApp</dd>
-            </div>
-          </dl>
+          <ClipShot src="/screens/terlaris.webp" alt="Tabel produk terlaris dengan jumlah terjual, omzet, dan laba" width={1362} height={922} className="max-w-[760px]" />
         </GrowthCell>
         <GrowthCell
           icon={UsersThree}
