@@ -33,12 +33,12 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
     <div className="landing min-h-dvh overflow-x-clip">
       {/* Layar masuk: form di kiri, panel merek dengan screenshot asli di kanan */}
       {/* Di laptop: tepat satu layar (100dvh), isi menyesuaikan tinggi layar */}
-      <section className="p-2.5 md:p-4 lg:h-[100dvh] lg:min-h-[600px] lg:p-5">
+      <section className="relative p-2.5 md:p-4 lg:h-[100dvh] lg:min-h-[600px] lg:p-5">
         <div className="mx-auto grid min-h-[calc(100dvh-20px)] max-w-[1320px] grid-cols-1 gap-2.5 rounded-[32px] bg-surface p-2.5 shadow-[var(--shadow-float)] md:min-h-[calc(100dvh-32px)] md:p-3 lg:h-full lg:min-h-0 lg:grid-cols-2">
           <div className="flex min-w-0 flex-col px-4 pb-4 pt-4 md:px-8 md:pt-6 lg:min-h-0 lg:overflow-y-auto lg:px-12 lg:pt-5">
             <div className="flex items-center justify-between gap-3">
               <Logo />
-              <a href="#fitur" className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[14px] font-semibold text-ink-2 hover:text-ink">
+              <a href="#lihat-fitur" className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[14px] font-semibold text-ink-2 hover:text-ink lg:hidden">
                 Lihat fitur <ArrowDown size={15} weight="bold" aria-hidden />
               </a>
             </div>
@@ -55,6 +55,21 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
 
           <AuthShowcase className="min-h-[560px] lg:h-full lg:min-h-0" />
         </div>
+
+        {/* Penanda bahwa halaman bisa digulir: pil di tengah bawah, menempel di tepi kartu */}
+        <button
+          type="button"
+          onClick={() => {
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            document.getElementById('lihat-fitur')?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+          }}
+          className="scroll-cue pressable absolute bottom-9 left-1/2 z-10 hidden -translate-x-1/2 translate-y-1/2 items-center gap-2 rounded-full bg-ink py-2.5 pl-5 pr-2.5 text-[14px] font-semibold text-canvas shadow-[var(--shadow-float)] hover:bg-brand lg:inline-flex"
+        >
+          Gulir untuk lihat fitur
+          <span className="grid size-8 place-items-center rounded-full bg-lime text-on-lime">
+            <ArrowDown size={16} weight="bold" className="cue-arrow" aria-hidden />
+          </span>
+        </button>
       </section>
 
       <Showcase />
