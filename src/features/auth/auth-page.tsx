@@ -28,7 +28,7 @@ export function AuthPage({ mode: initialMode }: { mode: Mode }) {
   };
 
   return (
-    <div className="min-h-dvh overflow-x-clip">
+    <div className="landing min-h-dvh overflow-x-clip">
       <header className="material sticky top-0 z-40 border-b border-line/70">
         <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-3 px-5 md:h-[72px] md:px-8">
           <Logo />

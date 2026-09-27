@@ -207,9 +207,10 @@ export function FeatureTour() {
               id={`panel-${t.key}`}
               aria-labelledby={`tab-${t.key}`}
               hidden={t.key !== active}
-              className="tour-panel grid min-h-[420px] place-items-center rounded-[28px] p-5 md:p-8"
-              style={{ background: 'var(--tint-mint-bg)' }}
+              className="tour-panel relative isolate grid min-h-[420px] place-items-center overflow-clip rounded-[28px] p-5 md:p-8"
+              style={{ background: 'var(--deep)' }}
             >
+              <span aria-hidden className="brand-rings -bottom-40 -right-32 -z-10 size-[420px] border-[64px]" />
               {t.shot.phone ? (
                 <PhoneShot src={t.shot.src} alt={t.shot.alt} className="w-[min(280px,80%)]" />
               ) : (
